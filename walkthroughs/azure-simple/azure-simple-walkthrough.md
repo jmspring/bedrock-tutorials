@@ -194,8 +194,108 @@ ARM_CLIENT_ID=7b6ab9ae-dead-abcd-8b52-0a8ecb5beef7
 
 ### Clone The Bedrock Repository
 
+The Bedrock repository is [here](https://github.com/microsoft/bedrock).  To clone it, simply use the `git` command line:
+
+```bash
+kudzu:azure-simple jmspring$ git clone https://github.com/microsoft/bedrock.git
+Cloning into 'bedrock'...
+remote: Enumerating objects: 37, done.
+remote: Counting objects: 100% (37/37), done.
+remote: Compressing objects: 100% (32/32), done.
+remote: Total 2154 (delta 11), reused 11 (delta 5), pack-reused 2117
+Receiving objects: 100% (2154/2154), 29.33 MiB | 6.15 MiB/s, done.
+Resolving deltas: 100% (1022/1022), done.
+```
+
+To verify, let's navigate to the `bedrock/cluster/environments` directory and do an `ls`:
+
+```bash
+kudzu:environments jmspring$ ls -l
+total 0
+drwxr-xr-x   8 jmspring  staff  256 Jun 12 09:11 azure-common-infra
+drwxr-xr-x  15 jmspring  staff  480 Jun 12 09:11 azure-multiple-clusters
+drwxr-xr-x   6 jmspring  staff  192 Jun 12 09:11 azure-simple
+drwxr-xr-x   7 jmspring  staff  224 Jun 12 09:11 azure-single-keyvault
+drwxr-xr-x   7 jmspring  staff  224 Jun 12 09:11 azure-velero-restore
+drwxr-xr-x   3 jmspring  staff   96 Jun 12 09:11 minikube
+```
+
+Each of the directories represent a common pattern supported within Bedrock.  You can read more about them [on the Bedrock github](https://github.com/microsoft/bedrock/tree/master/cluster/azure).  
+
 ### Setup Terraform Deployment Variables for Azure Simple
 
+As mentioned, we will be using the `azure-simple`, changing into that directory and doing an `ls` reveals:
+
+```bash
+kudzu:environments jmspring$ cd azure-simple
+kudzu:azure-simple jmspring$ ls -l
+total 32
+-rw-r--r--  1 jmspring  staff   460 Jun 12 09:11 README.md
+-rw-r--r--  1 jmspring  staff  1992 Jun 12 09:11 main.tf
+-rw-r--r--  1 jmspring  staff   703 Jun 12 09:11 terraform.tfvars
+-rw-r--r--  1 jmspring  staff  2465 Jun 12 09:11 variables.tf
+```
+
+The inputs for a Terraform deployment are typically specified in a `.tfvars` file.  In the `azure-simple` repository, a skeleton exists in the form of `terraform.tfvars`.  The contents of `terraform.tfvars` is as follows:
+
+```bash
+kudzu:azure-simple jmspring$ cat terraform.tfvars
+resource_group_name="resource-group-name"
+resource_group_location="westus2"
+cluster_name="cluster-name"
+agent_vm_count = "3"
+dns_prefix="dns-prefix"
+service_principal_id = "client-id"
+service_principal_secret = "client-secret"
+ssh_public_key = "public-key"
+gitops_ssh_url = "git@github.com:timfpark/fabrikate-cloud-native-manifests.git"
+gitops_ssh_key = "<path to private gitops repo key>"
+vnet_name = "<vnet name>"
+
+#--------------------------------------------------------------
+# Optional variables - Uncomment to use
+#--------------------------------------------------------------
+# gitops_url_branch = "release-123"
+# gitops_poll_interval = "30s"
+# gitops_path = "prod"
+# network_policy = "calico"
+```
+
+At this point, we have values for `service_principal_id`, `service_principal_secret`, `ssh_public_key`, `gitops_ssh_url`, `gitops_ssh_key`.  For purposes of this walkthrough, `agent_vm_count` and `resource_group_location` are reasonable defaults.  So, let's define the remainder as follows:
+
+- `resource_group_name`: `testazuresimplerg`
+- `cluster_name`: `testazuresimplecluster`
+- `dns_prefix`: `testazuresimple`
+- `vnet_name`: `testazuresimplevnet`
+
+`gitops_ssh_url` is the sample application repository that was previously [cloned](#forking-the-repository).  For this tutorial, given the GitHub user `jmspring`, the value is `git@github.com:jmspring/sample_app_manifests.git`.  It should also be noted, `gitops_ssh_key` is a *path* to the RSA private key we created [here](#create-an-rsa-key-pair-for-a-deploy-key-for-the-flux-repository) and `ssh_public_key` is the RSA public key that was created for [AKS node access](#creating-an-rsa-key-for-logging-into-aks-nodes).
+
+Make a copy of the `terraform.tfvars` file and name it `testazuresimple.tfvars` for a working copy.  Next, using those values just defined and filling in the other values that were generated above, `testazuresimple.tfvars` should resemble:
+
+```bash
+kudzu:azure-simple jmspring$ cat testazuresimple.tfvars
+resource_group_name="testazuresimplerg"
+resource_group_location="westus2"
+cluster_name="testazuresimplecluster"
+agent_vm_count = "3"
+dns_prefix="testazuresimple"
+service_principal_id = "7b6ab9ae-dead-abcd-8b52-0a8ecb5beef7"
+service_principal_secret = "35591cab-13c9-4b42-8a83-59c8867bbdc2"
+ssh_public_key = "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCo5cFB/HiJB3P5s5kL3O24761oh8dVArCs9oMqdR09+hC5lD15H6neii4azByiMB1AnWQvVbk+i0uwBTl5riPgssj6vWY5sUS0HQsEAIRkzphik0ndS0+U8QI714mb3O0+qA4UYQrDQ3rq/Ak+mkfK0NQYL08Vo0vuE4PnmyDbcR8Pmo6xncj/nlWG8UzwjazpPCsP20p/egLldcvU59ikvY9+ZIsBdAGGZS29r39eoXzA4MKZZqXU/znttqa0Eed8a3pFWuE2UrntLPLrgg5hvliOmEfkUw0LQ3wid1+4H/ziCgPY6bhYJlMlf7WSCnBpgTq3tlgaaEHoE8gTjadKBk6bcrTaDZ5YANTEFAuuIooJgT+qlLrVql+QT2Qtln9CdMv98rP7yBiVVtQGcOJyQyG5D7z3lysKqCMjkMXOCH2UMJBrurBqxr6UDV3btQmlPOGI8PkgjP620dq35ZmDqBDfTLpsAW4s8o9zlT2jvCF7C1qhg81GuZ37Vop/TZDNShYIQF7ekc8IlhqBpbdhxWV6ap16paqNxsF+X4dPLW6AFVogkgNLJXiW+hcfG/lstKAPzXAVTy2vKh+29OsErIiL3SDqrXrNSmGmXwtFYGYg3XZLiEjleEzK54vYAbdEPElbNvOzvRCNdGkorw0611tpCntbpC79Q/+Ij6eyfQ== jmspring@kudzu"
+gitops_ssh_url = "git@github.com:jmspring/sample_app_manifests.git"
+gitops_ssh_key = "/home/jims/.ssh/azure-simple-deploy-key"
+vnet_name = "testazuresimplevnet"
+
+#--------------------------------------------------------------
+# Optional variables - Uncomment to use
+#--------------------------------------------------------------
+# gitops_url_branch = "release-123"
+# gitops_poll_interval = "30s"
+gitops_path = "prod"
+# network_policy = "calico"
+```
+
+Note, since our Flux deployment manifests are actually in a sub-directory within our [Flux Manifest Repository](#forking-the-repository), `gitops_path` was uncommented.
 
 ### Deploy the Azure Simple Template
 
