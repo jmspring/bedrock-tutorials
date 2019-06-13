@@ -34,10 +34,46 @@ The Azure CLI install guide can be found [here](https://docs.microsoft.com/en-us
 
 As previously mentioned, this document will leverage a pre-existing Flux manifest repository.  However, there is still a bit of work necessary to do so.  The repository we will base this work off of is [here](https://github.com/andrebriggs/sample_app_manifests/tree/master/prod).  To use this repository we must:
 
-1. Fork the repository
-2. Create an RSA keypair for the Flux repository
+1. Create an RSA keypair for the Flux repository
+2. Fork the repository
 3. Add the keypair to the repository
 
-#### Forking the Repository
 
-Go to 
+#### Create an RSA Key Pair for a Deploy Key for the Flux Repository
+
+The [deploy key](https://developer.github.com/v3/guides/managing-deploy-keys/#deploy-keys) is generated using `ssk-keygen`.  The public portion will be installed as a deploy key once the repository is forked.
+
+To generate the key:
+
+```bash
+kudzu:azure-simple jmspring$ ssh-keygen -b 4096 -t rsa -f ~/.ssh/azure-simple-deploy-key
+Generating public/private rsa key pair.
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in /Users/jmspring/.ssh/azure-simple-deploy-key.
+Your public key has been saved in /Users/jmspring/.ssh/azure-simple-deploy-key.pub.
+The key fingerprint is:
+SHA256:jago9v63j05u9WoiNExnPM2KAWBk1eTHT2AmhIWPIXM jmspring@kudzu.local
+The key's randomart image is:
++---[RSA 4096]----+
+|.=o.B= +         |
+|oo E..= .        |
+|  + =..oo.       |
+|   . +.*o=       |
+|    o * S..      |
+|   . * . .       |
+|... o ... .      |
+|...  .o+.. .     |
+|  .o..===o.      |
++----[SHA256]-----+
+kudzu:azure-simple jmspring$ 
+```
+
+We will revisit the key in third step below.
+
+###  Forking the Repository
+
+To fork the repository, click [here](https://github.com/andrebriggs/sample_app_manifests/tree/master/prod).  You should see:
+
+![initial repository](https://raw.githubusercontent.com/jmspring/bedrock-tutorials/master/walkthroughs/azure-simple/images/initial_repository.jpg)
+
