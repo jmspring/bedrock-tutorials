@@ -295,9 +295,183 @@ gitops_path = "prod"
 # network_policy = "calico"
 ```
 
-Note, since our Flux deployment manifests are actually in a sub-directory within our [Flux Manifest Repository](#forking-the-repository), `gitops_path` was uncommented.
+Note, since our Flux deployment manifests are actually in a sub-directory within our [Flux Manifest Repository](#forking-the-repository), `gitops_path` has been uncommented.
 
 ### Deploy the Azure Simple Template
 
+With the Terraform variables file created, [testazuresimple.tfvars] (#setup-terraform-deployment-variables-for-azure-simple), it is time to do the Terraform deployment.  There are a couple of steps to this process:
+
+- `terraform init` which initializes the local directory with metadata and other necessities Terraform needs.
+- `terraform plan` which sanity checks your variables against the deployment
+- `terraform apply` which actually deploys the infrastructure defined
+
+Make sure one is in the `bedrock/cluster/environments/azure-simple` directory and that you know the path to `testazuresimple.tfvars` (it is assumed that is in the same directory as the `azure-simple` environment).
+
+First execute `terraform init`:
+
+```bash
+kudzu:azure-simple jmspring$ terraform init
+Initializing modules...
+- module.provider
+  Getting source "github.com/Microsoft/bedrock/cluster/azure/provider"
+- module.vnet
+  Getting source "github.com/Microsoft/bedrock/cluster/azure/vnet"
+- module.aks-gitops
+  Getting source "github.com/Microsoft/bedrock/cluster/azure/aks-gitops"
+- module.provider.common-provider
+  Getting source "../../common/provider"
+- module.aks-gitops.aks
+  Getting source "../../azure/aks"
+- module.aks-gitops.flux
+  Getting source "../../common/flux"
+- module.aks-gitops.kubediff
+  Getting source "../../common/kubediff"
+- module.aks-gitops.aks.azure-provider
+  Getting source "../provider"
+- module.aks-gitops.aks.azure-provider.common-provider
+  Getting source "../../common/provider"
+- module.aks-gitops.flux.common-provider
+  Getting source "../provider"
+- module.aks-gitops.kubediff.common-provider
+  Getting source "../provider"
+
+Initializing provider plugins...
+- Checking for available provider plugins on https://releases.hashicorp.com...
+- Downloading plugin for provider "null" (2.1.2)...
+- Downloading plugin for provider "azurerm" (1.29.0)...
+- Downloading plugin for provider "azuread" (0.3.1)...
+
+Terraform has been successfully initialized!
+
+You may now begin working with Terraform. Try running "terraform plan" to see
+any changes that are required for your infrastructure. All Terraform commands
+should now work.
+
+If you ever set or change modules or backend configuration for Terraform,
+rerun this command to reinitialize your working directory. If you forget, other
+commands will detect it and remind you to do so if necessary.
+```
+
+Next, execute `terraform plan` and specify the location of our variables file:
+
+```bash
+kudzu:azure-simple jmspring$ terraform plan -var-file=testazuresimple.tfvars 
+Refreshing Terraform state in-memory prior to plan...
+The refreshed state will be used to calculate this plan, but will not be
+persisted to local or remote state storage.
+
+
+------------------------------------------------------------------------
+
+An execution plan has been generated and is shown below.
+Resource actions are indicated with the following symbols:
+  + create
+
+Terraform will perform the following actions:
+
+  + azurerm_resource_group.cluster_rg
+      id:                                         <computed>
+      location:                                   "westus2"
+      name:                                       "testazuresimplerg"
+      tags.%:                                     <computed>
+
+  + module.vnet.azurerm_resource_group.vnet
+      id:                                         <computed>
+      location:                                   "westus2"
+      name:                                       "testazuresimplerg"
+      tags.%:                                     <computed>
+
+  + module.vnet.azurerm_subnet.subnet
+      id:                                         <computed>
+      address_prefix:                             "10.10.1.0/24"
+      ip_configurations.#:                        <computed>
+      name:                                       "testazuresimplecluster-aks-subnet"
+      resource_group_name:                        "testazuresimplerg"
+      service_endpoints.#:                        "1"
+      virtual_network_name:                       "testazuresimplevnet"
+
+  + module.vnet.azurerm_virtual_network.vnet
+      id:                                         <computed>
+      address_space.#:                            "1"
+      address_space.0:                            "10.10.0.0/16"
+      location:                                   "westus2"
+      name:                                       "testazuresimplevnet"
+      resource_group_name:                        "testazuresimplerg"
+      subnet.#:                                   <computed>
+      tags.%:                                     "1"
+      tags.environment:                           "azure-simple"
+
+  + module.aks-gitops.module.aks.azurerm_kubernetes_cluster.cluster
+      id:                                         <computed>
+      addon_profile.#:                            <computed>
+      agent_pool_profile.#:                       "1"
+      agent_pool_profile.0.count:                 "3"
+      agent_pool_profile.0.dns_prefix:            <computed>
+      agent_pool_profile.0.fqdn:                  <computed>
+      agent_pool_profile.0.max_pods:              <computed>
+      agent_pool_profile.0.name:                  "default"
+      agent_pool_profile.0.os_disk_size_gb:       "30"
+      agent_pool_profile.0.os_type:               "Linux"
+      agent_pool_profile.0.type:                  "AvailabilitySet"
+      agent_pool_profile.0.vm_size:               "Standard_D2s_v3"
+      agent_pool_profile.0.vnet_subnet_id:        "${var.vnet_subnet_id}"
+      dns_prefix:                                 "testazuresimple"
+      fqdn:                                       <computed>
+      kube_admin_config.#:                        <computed>
+      kube_admin_config_raw:                      <computed>
+      kube_config.#:                              <computed>
+      kube_config_raw:                            <computed>
+      kubernetes_version:                         "1.13.5"
+      linux_profile.#:                            "1"
+      linux_profile.0.admin_username:             "k8sadmin"
+      linux_profile.0.ssh_key.#:                  "1"
+      linux_profile.0.ssh_key.0.key_data:         "ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQCo5cFB/HiJB3P5s5kL3O24761oh8dVArCs9oMqdR09+hC5lD15H6neii4azByiMB1AnWQvVbk+i0uwBTl5riPgssj6vWY5sUS0HQsEAIRkzphik0ndS0+U8QI714mb3O0+qA4UYQrDQ3rq/Ak+mkfK0NQYL08Vo0vuE4PnmyDbcR8Pmo6xncj/nlWG8UzwjazpPCsP20p/egLldcvU59ikvY9+ZIsBdAGGZS29r39eoXzA4MKZZqXU/znttqa0Eed8a3pFWuE2UrntLPLrgg5hvliOmEfkUw0LQ3wid1+4H/ziCgPY6bhYJlMlf7WSCnBpgTq3tlgaaEHoE8gTjadKBk6bcrTaDZ5YANTEFAuuIooJgT+qlLrVql+QT2Qtln9CdMv98rP7yBiVVtQGcOJyQyG5D7z3lysKqCMjkMXOCH2UMJBrurBqxr6UDV3btQmlPOGI8PkgjP620dq35ZmDqBDfTLpsAW4s8o9zlT2jvCF7C1qhg81GuZ37Vop/TZDNShYIQF7ekc8IlhqBpbdhxWV6ap16paqNxsF+X4dPLW6AFVogkgNLJXiW+hcfG/lstKAPzXAVTy2vKh+29OsErIiL3SDqrXrNSmGmXwtFYGYg3XZLiEjleEzK54vYAbdEPElbNvOzvRCNdGkorw0611tpCntbpC79Q/+Ij6eyfQ== jims@fubu"
+      location:                                   "westus2"
+      name:                                       "testazuresimplecluster"
+      network_profile.#:                          "1"
+      network_profile.0.dns_service_ip:           "10.0.0.10"
+      network_profile.0.docker_bridge_cidr:       "172.17.0.1/16"
+      network_profile.0.network_plugin:           "azure"
+      network_profile.0.network_policy:           "azure"
+      network_profile.0.pod_cidr:                 <computed>
+      network_profile.0.service_cidr:             "10.0.0.0/16"
+      node_resource_group:                        <computed>
+      resource_group_name:                        "testazuresimplerg"
+      role_based_access_control.#:                "1"
+      role_based_access_control.0.enabled:        "true"
+      service_principal.#:                        "1"
+      service_principal.3262013094.client_id:     "7b6ab9ae-7de4-4394-8b52-0a8ecb5d2bf7"
+      service_principal.3262013094.client_secret: <sensitive>
+      tags.%:                                     <computed>
+
+  + module.aks-gitops.module.aks.azurerm_resource_group.cluster
+      id:                                         <computed>
+      location:                                   "westus2"
+      name:                                       "testazuresimplerg"
+      tags.%:                                     <computed>
+
+  + module.aks-gitops.module.aks.null_resource.cluster_credentials
+      id:                                         <computed>
+      triggers.%:                                 "2"
+      triggers.kubeconfig_recreate:               ""
+      triggers.kubeconfig_to_disk:                "true"
+
+  + module.aks-gitops.module.flux.null_resource.deploy_flux
+      id:                                         <computed>
+      triggers.%:                                 "2"
+      triggers.enable_flux:                       "true"
+      triggers.flux_recreate:                     ""
+
+
+Plan: 8 to add, 0 to change, 0 to destroy.
+
+------------------------------------------------------------------------
+
+Note: You didn't specify an "-out" parameter to save this plan, so Terraform
+can't guarantee that exactly these actions will be performed if
+"terraform apply" is subsequently run.
+```
+
+As seen from the output, a number of objects have been defined for creation.
 
 ### Interact with the Deployed Cluster
