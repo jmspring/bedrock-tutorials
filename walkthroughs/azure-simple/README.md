@@ -268,6 +268,11 @@ At this point, we have values for `service_principal_id`, `service_principal_sec
 - `dns_prefix`: `testazuresimple`
 - `vnet_name`: `testazuresimplevnet`
 
+In addition, since the Flux manifest repository has a number of resource hungry components, we will need to modify `agent_vm_count` and add `agent_vm_size` as follows:
+
+- `agent_vm_size` : `Standard_D4s_v3`
+- `agent_vm_count` :`6`
+
 `gitops_ssh_url` is the sample application repository that was previously [cloned](#forking-the-repository).  For this tutorial, given the GitHub user `jmspring`, the value is `git@github.com:jmspring/sample_app_manifests.git`.  It should also be noted, `gitops_ssh_key` is a *path* to the RSA private key we created [here](#create-an-rsa-key-pair-for-a-deploy-key-for-the-flux-repository) and `ssh_public_key` is the RSA public key that was created for [AKS node access](#creating-an-rsa-key-for-logging-into-aks-nodes).
 
 Make a copy of the `terraform.tfvars` file and name it `testazuresimple.tfvars` for a working copy.  Next, using those values just defined and filling in the other values that were generated above, `testazuresimple.tfvars` should resemble:
@@ -277,7 +282,8 @@ kudzu:azure-simple jmspring$ cat testazuresimple.tfvars
 resource_group_name="testazuresimplerg"
 resource_group_location="westus2"
 cluster_name="testazuresimplecluster"
-agent_vm_count = "3"
+agent_vm_size = "Standard_D4s_v3"
+agent_vm_count = "6"
 dns_prefix="testazuresimple"
 service_principal_id = "7b6ab9ae-dead-abcd-8b52-0a8ecb5beef7"
 service_principal_secret = "35591cab-13c9-4b42-8a83-59c8867bbdc2"
@@ -405,7 +411,7 @@ Terraform will perform the following actions:
       id:                                         <computed>
       addon_profile.#:                            <computed>
       agent_pool_profile.#:                       "1"
-      agent_pool_profile.0.count:                 "3"
+      agent_pool_profile.0.count:                 "6"
       agent_pool_profile.0.dns_prefix:            <computed>
       agent_pool_profile.0.fqdn:                  <computed>
       agent_pool_profile.0.max_pods:              <computed>
@@ -413,7 +419,7 @@ Terraform will perform the following actions:
       agent_pool_profile.0.os_disk_size_gb:       "30"
       agent_pool_profile.0.os_type:               "Linux"
       agent_pool_profile.0.type:                  "AvailabilitySet"
-      agent_pool_profile.0.vm_size:               "Standard_D2s_v3"
+      agent_pool_profile.0.vm_size:               "Standard_D4s_v3"
       agent_pool_profile.0.vnet_subnet_id:        "${var.vnet_subnet_id}"
       dns_prefix:                                 "testazuresimple"
       fqdn:                                       <computed>
@@ -521,7 +527,7 @@ Terraform will perform the following actions:
       id:                                         <computed>
       addon_profile.#:                            <computed>
       agent_pool_profile.#:                       "1"
-      agent_pool_profile.0.count:                 "3"
+      agent_pool_profile.0.count:                 "6"
       agent_pool_profile.0.dns_prefix:            <computed>
       agent_pool_profile.0.fqdn:                  <computed>
       agent_pool_profile.0.max_pods:              <computed>
@@ -529,7 +535,7 @@ Terraform will perform the following actions:
       agent_pool_profile.0.os_disk_size_gb:       "30"
       agent_pool_profile.0.os_type:               "Linux"
       agent_pool_profile.0.type:                  "AvailabilitySet"
-      agent_pool_profile.0.vm_size:               "Standard_D2s_v3"
+      agent_pool_profile.0.vm_size:               "Standard_D4s_v3"
       agent_pool_profile.0.vnet_subnet_id:        "${var.vnet_subnet_id}"
       dns_prefix:                                 "testazuresimple"
       fqdn:                                       <computed>
@@ -615,36 +621,6 @@ module.vnet.azurerm_virtual_network.vnet: Still creating... (10s elapsed)
 module.vnet.azurerm_virtual_network.vnet: Creation complete after 14s (ID: /subscriptions/7060bca0-7a3c-44bd-b54c-...rk/virtualNetworks/testazuresimplevnet)
 module.vnet.azurerm_subnet.subnet: Creating...
 ...
-module.aks-gitops.module.flux.null_resource.deploy_flux: Creating...
-  triggers.%:             "" => "2"
-  triggers.enable_flux:   "" => "true"
-  triggers.flux_recreate: "" => ""
-module.aks-gitops.module.flux.null_resource.deploy_flux: Provisioning with 'local-exec'...
-module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): Executing: ["/bin/sh" "-c" "echo 'Need to use this var so terraform waits for kubeconfig ' 1590862899062177449;KUBECONFIG=./output/bedrock_kube_config /home/jims/code/src/github.com/microsoft/bedrock/cluster/environments/azure-simple/.terraform/modules/7836162b7abd77fba9c644439dc54fd9/deploy_flux.sh -b 'master' -f 'https://github.com/weaveworks/flux.git' -g 'git@github.com:jmspring/sample_app_manifests.git' -k '/home/jims/.ssh/azure-simple-deploy-key' -d 'testazuresimplecluster-flux' -c '5m' -e 'prod' -s 'true' -r 'docker.io/weaveworks/flux' -t '1.12.2'"]
-module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): Need to use this var so terraform waits for kubeconfig  1590862899062177449
-module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): flux repo root directory: testazuresimplecluster-flux
-module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): creating testazuresimplecluster-flux directory
-module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): cloning https://github.com/weaveworks/flux.git
-module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): Cloning into 'flux'...
-module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): Note: checking out 'e366684a9e995d447e6471543a832a325ff87f5a'.
-
-module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): You are in 'detached HEAD' state. You can look around, make experimental
-module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): changes and commit them, and you can discard any commits you make in this
-module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): state without impacting any branches by performing another checkout.
-
-module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): If you want to create a new branch to retain commits you create, you may
-module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): do so (now or later) by using -b with the checkout command again. Example:
-
-module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec):   git checkout -b <new-branch-name>
-
-module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): creating manifests directory
-module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): generating flux manifests with helm template
-module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): wrote ./manifests/flux/templates/kube.yaml
-module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): wrote ./manifests/flux/templates/serviceaccount.yaml
-module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): wrote ./manifests/flux/templates/rbac.yaml
-module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): wrote ./manifests/flux/templates/service.yaml
-module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): wrote ./manifests/flux/templates/deployment.yaml
-module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): wrote ./manifests/flux/templates/memcached.yaml
 module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): creating kubernetes namespace flux if needed
 module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): namespace/flux created
 module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): creating kubernetes secret flux-ssh from key file path /home/jims/.ssh/azure-simple-deploy-key
@@ -658,9 +634,7 @@ module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): clusterrol
 module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): clusterrolebinding.rbac.authorization.k8s.io/flux created
 module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): service/flux created
 module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): serviceaccount/flux created
-module.aks-gitops.module.flux.null_resource.deploy_flux: Creation complete after 9s (ID: 5971670934663574000)
-
-Apply complete! Resources: 8 added, 0 changed, 0 destroyed.
+module.aks-gitops.module.flux.null_resource.deploy_flux: Creation complete after 8s (ID: 541853462335433160)
 ```
 
 After `terraform apply` finishes, there is one critical output artifact.  In the `output` directory that was generated is the Kubernetes config file for the deployed cluster.  The default file is `output/bedrock_kube_config`.  This file will be needed for the following steps.
@@ -670,82 +644,106 @@ After `terraform apply` finishes, there is one critical output artifact.  In the
 Upon the deployment of the Bedrock AKS cluster, it is possible to start interacting with it.  Using the config file `output/bedrock_kube_config`, one of the first things we can do is list all pods deployed within the cluster:
 
 ```bash
-kudzu:azure-simple jmspring$ KUBECONFIG=./output/bedrock_kube_config kubectl get po --all-namespaces
+KUBECONFIG=./output/bedrock_kube_config kubectl get po --all-namespaces
 NAMESPACE       NAME                                            READY   STATUS                       RESTARTS   AGE
-default         api-deploy-canary-5874f98bf8-kjqjd              0/1     CreateContainerConfigError   0          7m52s
-default         api-deploy-canary-5874f98bf8-nt284              0/1     CreateContainerConfigError   0          7m52s
-default         api-deploy-canary-5874f98bf8-xrbpd              0/1     CreateContainerConfigError   0          7m52s
-default         api-deploy-stable-647455778-d72m9               0/1     CreateContainerConfigError   0          7m52s
-default         api-deploy-stable-647455778-fqbzz               0/1     CreateContainerConfigError   0          7m52s
-default         api-deploy-stable-647455778-npfpt               0/1     CreateContainerConfigError   0          7m52s
-default         spring-boot-ui-84f97849c-wgmhj                  0/2     Pending                      0          3m18s
-default         spring-boot-ui-84f97849c-whv5m                  0/2     Pending                      0          3m18s
-default         spring-boot-ui-84f97849c-z64fn                  0/2     Pending                      0          3m18s
-elasticsearch   elasticsearch-client-6cb57d4664-2bpvt           1/1     Running                      0          7m52s
-elasticsearch   elasticsearch-client-6cb57d4664-xl78h           1/1     Running                      0          7m52s
-elasticsearch   elasticsearch-data-0                            1/1     Running                      0          7m51s
-elasticsearch   elasticsearch-data-1                            0/1     Running                      0          60s
-elasticsearch   elasticsearch-master-0                          1/1     Running                      0          7m51s
-elasticsearch   elasticsearch-master-1                          1/1     Running                      0          92s
-elasticsearch   elasticsearch-master-2                          0/1     Init:0/2                     0          26s
-elasticsearch   elasticsearch-test                              0/1     Error                        0          7m50s
-fluentd         fluentd-elasticsearch-kq5n4                     1/1     Running                      0          7m51s
-fluentd         fluentd-elasticsearch-lwvzn                     1/1     Running                      0          7m51s
-fluentd         fluentd-elasticsearch-mfbjj                     1/1     Running                      0          7m51s
-flux            flux-7fb6b99bb4-4xfmk                           1/1     Running                      0          8m35s
-flux            flux-memcached-757756884-pmsfx                  1/1     Running                      0          8m36s
-grafana         grafana-588659577-qwmj6                         1/1     Running                      0          7m51s
-grafana         grafana-test                                    0/1     Error                        0          7m49s
-istio-system    istio-citadel-7579f8fbb9-v4mjn                  1/1     Running                      0          7m51s
-istio-system    istio-cleanup-secrets-1.1.2-xklpn               0/1     Completed                    0          7m51s
-istio-system    istio-galley-79d4c5d9f7-85449                   1/1     Running                      0          7m51s
-istio-system    istio-ingressgateway-5fbcf4488f-gf6rk           1/1     Running                      0          7m51s
-istio-system    istio-init-crd-10-8dhhh                         0/1     Completed                    0          7m51s
-istio-system    istio-init-crd-11-gnjb2                         0/1     Completed                    0          7m51s
-istio-system    istio-pilot-df78f86cb-5qmd8                     2/2     Running                      0          7m51s
-istio-system    istio-policy-5df6f5457d-bgclx                   2/2     Running                      1          7m51s
-istio-system    istio-security-post-install-1.1.2-4nqmd         0/1     Completed                    0          7m51s
-istio-system    istio-sidecar-injector-57f445c786-thc95         1/1     Running                      0          7m50s
-istio-system    istio-telemetry-644b7d54c6-c8z2b                0/2     Pending                      0          7m50s
-istio-system    kiali-5448cc49fb-sx54z                          1/1     Running                      0          7m50s
-jaeger          jaeger-agent-6j6z6                              1/1     Running                      0          7m51s
-jaeger          jaeger-agent-ljcpq                              1/1     Running                      0          7m51s
-jaeger          jaeger-agent-z8w8q                              1/1     Running                      0          7m51s
-jaeger          jaeger-collector-6557764f56-7smk9               0/1     Pending                      0          7m50s
-jaeger          jaeger-collector-6557764f56-mnrvx               0/1     CrashLoopBackOff             5          7m50s
-jaeger          jaeger-collector-6557764f56-v4qs4               1/1     Running                      6          7m50s
-jaeger          jaeger-query-7bdc575489-fn4t7                   0/1     CrashLoopBackOff             5          7m50s
-jaeger          jaeger-query-7bdc575489-hf2nd                   0/1     CrashLoopBackOff             5          7m50s
-kibana          kibana-6dcc9c694f-2thnp                         1/1     Running                      0          7m49s
-kibana          kibana-test                                     0/1     Error                        0          7m49s
-kube-system     azure-cni-networkmonitor-5jqtp                  1/1     Running                      0          10m
-kube-system     azure-cni-networkmonitor-b85jg                  1/1     Running                      0          10m
-kube-system     azure-cni-networkmonitor-kzdpl                  1/1     Running                      0          10m
-kube-system     azure-ip-masq-agent-7d5dm                       1/1     Running                      0          10m
-kube-system     azure-ip-masq-agent-8vh9k                       1/1     Running                      0          10m
-kube-system     azure-ip-masq-agent-hgscb                       1/1     Running                      0          10m
-kube-system     azure-npm-46l64                                 1/1     Running                      1          10m
-kube-system     azure-npm-rl7vc                                 1/1     Running                      1          10m
-kube-system     azure-npm-tqnlv                                 1/1     Running                      1          10m
-kube-system     coredns-6b58b8549f-27m57                        1/1     Running                      0          9m47s
-kube-system     coredns-6b58b8549f-gxddk                        1/1     Running                      0          13m
-kube-system     coredns-autoscaler-7595c6bd66-6tjm5             1/1     Running                      0          13m
-kube-system     kube-proxy-627x7                                1/1     Running                      0          10m
-kube-system     kube-proxy-drk6h                                1/1     Running                      0          10m
-kube-system     kube-proxy-jjgcm                                1/1     Running                      0          10m
-kube-system     kubernetes-dashboard-69b6c88658-nrpzm           1/1     Running                      1          13m
-kube-system     kured-9mm7d                                     1/1     Running                      0          7m50s
-kube-system     kured-9z4h7                                     1/1     Running                      0          7m50s
-kube-system     kured-nh9bl                                     1/1     Running                      0          7m50s
-kube-system     metrics-server-766dd9f7fd-b7bn8                 1/1     Running                      1          13m
-kube-system     tunnelfront-9fb57f856-7p7c2                     1/1     Running                      0          13m
-prometheus      prometheus-alertmanager-85b785566b-hxd45        2/2     Running                      0          7m49s
-prometheus      prometheus-kube-state-metrics-d46cdf5b4-w4scc   1/1     Running                      0          7m49s
-prometheus      prometheus-node-exporter-fq7pt                  1/1     Running                      0          7m50s
-prometheus      prometheus-node-exporter-hmglx                  1/1     Running                      0          7m50s
-prometheus      prometheus-node-exporter-tgjtz                  1/1     Running                      0          7m50s
-prometheus      prometheus-pushgateway-5c949bfd75-s27xb         1/1     Running                      0          7m49s
-prometheus      prometheus-server-6876b75fbd-9st6c              2/2     Running                      0          7m49s
+default         api-deploy-canary-5874f98bf8-4w4dh              0/1     CreateContainerConfigError   0          43m
+default         api-deploy-canary-5874f98bf8-fgm2h              0/1     CreateContainerConfigError   0          43m
+default         api-deploy-canary-5874f98bf8-ssft2              0/1     CreateContainerConfigError   0          43m
+default         api-deploy-stable-647455778-hwgw4               0/1     CreateContainerConfigError   0          43m
+default         api-deploy-stable-647455778-ld6fx               0/1     CreateContainerConfigError   0          43m
+default         api-deploy-stable-647455778-pjfrs               0/1     CreateContainerConfigError   0          43m
+default         spring-boot-ui-84f97849c-8qqr9                  2/2     Running                      0          40m
+default         spring-boot-ui-84f97849c-cbp2t                  2/2     Running                      0          40m
+default         spring-boot-ui-84f97849c-s68jb                  2/2     Running                      0          40m
+elasticsearch   elasticsearch-client-6cb57d4664-q4msw           1/1     Running                      0          43m
+elasticsearch   elasticsearch-client-6cb57d4664-w98sz           1/1     Running                      0          43m
+elasticsearch   elasticsearch-data-0                            1/1     Running                      0          43m
+elasticsearch   elasticsearch-data-1                            1/1     Running                      0          37m
+elasticsearch   elasticsearch-master-0                          1/1     Running                      0          43m
+elasticsearch   elasticsearch-master-1                          1/1     Running                      0          39m
+elasticsearch   elasticsearch-master-2                          1/1     Running                      0          38m
+elasticsearch   elasticsearch-test                              0/1     Error                        0          43m
+fluentd         fluentd-elasticsearch-2dz4t                     1/1     Running                      0          43m
+fluentd         fluentd-elasticsearch-7gkzl                     1/1     Running                      0          43m
+fluentd         fluentd-elasticsearch-b2mjt                     1/1     Running                      0          43m
+fluentd         fluentd-elasticsearch-mxwbs                     1/1     Running                      0          43m
+fluentd         fluentd-elasticsearch-pbvvw                     1/1     Running                      0          43m
+fluentd         fluentd-elasticsearch-rnx9t                     1/1     Running                      0          43m
+flux            flux-7fb6b99bb4-l8xtb                           1/1     Running                      0          44m
+flux            flux-memcached-757756884-rkwnv                  1/1     Running                      0          44m
+grafana         grafana-588659577-74c9x                         1/1     Running                      0          43m
+grafana         grafana-test                                    0/1     Error                        0          43m
+istio-system    istio-citadel-7579f8fbb9-qd4k7                  1/1     Running                      0          43m
+istio-system    istio-cleanup-secrets-1.1.2-gzgnm               0/1     Completed                    0          43m
+istio-system    istio-galley-79d4c5d9f7-s26kw                   1/1     Running                      0          43m
+istio-system    istio-ingressgateway-5fbcf4488f-2q2j2           1/1     Running                      0          43m
+istio-system    istio-init-crd-10-x568m                         0/1     Completed                    0          43m
+istio-system    istio-init-crd-11-4wv4c                         0/1     Completed                    0          43m
+istio-system    istio-pilot-df78f86cb-rpvwq                     2/2     Running                      0          43m
+istio-system    istio-policy-5df6f5457d-pw7g4                   2/2     Running                      0          43m
+istio-system    istio-security-post-install-1.1.2-gkwx8         0/1     Completed                    2          43m
+istio-system    istio-sidecar-injector-57f445c786-v5jb4         1/1     Running                      0          43m
+istio-system    istio-telemetry-644b7d54c6-hj9np                2/2     Running                      4          43m
+istio-system    kiali-5448cc49fb-cfn8h                          1/1     Running                      0          43m
+jaeger          jaeger-agent-7gjxf                              1/1     Running                      0          43m
+jaeger          jaeger-agent-kf6x7                              1/1     Running                      0          43m
+jaeger          jaeger-agent-l9vgk                              1/1     Running                      0          43m
+jaeger          jaeger-agent-m4bg7                              1/1     Running                      0          43m
+jaeger          jaeger-agent-vkm9z                              1/1     Running                      0          43m
+jaeger          jaeger-agent-wb4gm                              1/1     Running                      0          43m
+jaeger          jaeger-collector-6557764f56-2cb8x               1/1     Running                      6          43m
+jaeger          jaeger-collector-6557764f56-nnpz9               1/1     Running                      6          43m
+jaeger          jaeger-collector-6557764f56-v22mf               1/1     Running                      0          43m
+jaeger          jaeger-query-7bdc575489-5f8k4                   1/1     Running                      5          43m
+jaeger          jaeger-query-7bdc575489-8lpcc                   1/1     Running                      5          43m
+kibana          kibana-6dcc9c694f-9vgwv                         1/1     Running                      0          43m
+kibana          kibana-test                                     0/1     Completed                    0          43m
+kube-system     azure-cni-networkmonitor-868h9                  1/1     Running                      0          45m
+kube-system     azure-cni-networkmonitor-8xxkh                  1/1     Running                      0          47m
+kube-system     azure-cni-networkmonitor-9wn88                  1/1     Running                      0          47m
+kube-system     azure-cni-networkmonitor-cpksc                  1/1     Running                      0          47m
+kube-system     azure-cni-networkmonitor-mft8z                  1/1     Running                      0          47m
+kube-system     azure-cni-networkmonitor-nlfjp                  1/1     Running                      0          47m
+kube-system     azure-ip-masq-agent-5n48z                       1/1     Running                      0          47m
+kube-system     azure-ip-masq-agent-5w47r                       1/1     Running                      0          47m
+kube-system     azure-ip-masq-agent-cm8vl                       1/1     Running                      0          47m
+kube-system     azure-ip-masq-agent-nhk2m                       1/1     Running                      0          47m
+kube-system     azure-ip-masq-agent-nm5mx                       1/1     Running                      0          47m
+kube-system     azure-ip-masq-agent-r8dm5                       1/1     Running                      0          45m
+kube-system     azure-npm-5srf4                                 1/1     Running                      1          47m
+kube-system     azure-npm-gbxfm                                 1/1     Running                      1          45m
+kube-system     azure-npm-m4zcj                                 1/1     Running                      1          47m
+kube-system     azure-npm-ngqpk                                 1/1     Running                      1          47m
+kube-system     azure-npm-x24sc                                 1/1     Running                      1          47m
+kube-system     azure-npm-zmw22                                 1/1     Running                      1          47m
+kube-system     coredns-6b58b8549f-2d5sj                        1/1     Running                      0          46m
+kube-system     coredns-6b58b8549f-rbktl                        1/1     Running                      0          50m
+kube-system     coredns-autoscaler-7595c6bd66-lbmd7             1/1     Running                      0          50m
+kube-system     kube-proxy-4zbmd                                1/1     Running                      0          47m
+kube-system     kube-proxy-hq495                                1/1     Running                      0          47m
+kube-system     kube-proxy-rt6lq                                1/1     Running                      0          45m
+kube-system     kube-proxy-vxc6k                                1/1     Running                      0          47m
+kube-system     kube-proxy-xggwj                                1/1     Running                      0          47m
+kube-system     kube-proxy-xvdcq                                1/1     Running                      0          47m
+kube-system     kubernetes-dashboard-69b6c88658-kk2zw           1/1     Running                      1          50m
+kube-system     kured-gm478                                     1/1     Running                      0          43m
+kube-system     kured-j99k6                                     1/1     Running                      0          43m
+kube-system     kured-l8kvw                                     1/1     Running                      0          43m
+kube-system     kured-n2mvr                                     1/1     Running                      0          43m
+kube-system     kured-swhjk                                     1/1     Running                      0          43m
+kube-system     kured-vpjqx                                     1/1     Running                      0          43m
+kube-system     metrics-server-766dd9f7fd-pff2k                 1/1     Running                      1          50m
+kube-system     tunnelfront-85845d7cc4-qkcdx                    1/1     Running                      0          50m
+prometheus      prometheus-alertmanager-85b785566b-jpgt8        2/2     Running                      0          43m
+prometheus      prometheus-kube-state-metrics-d46cdf5b4-zpklf   1/1     Running                      0          43m
+prometheus      prometheus-node-exporter-52czp                  1/1     Running                      0          43m
+prometheus      prometheus-node-exporter-5kkwh                  1/1     Running                      0          43m
+prometheus      prometheus-node-exporter-brhkg                  1/1     Running                      0          43m
+prometheus      prometheus-node-exporter-cjd88                  1/1     Running                      0          43m
+prometheus      prometheus-node-exporter-hjdbn                  1/1     Running                      0          43m
+prometheus      prometheus-node-exporter-sdrrt                  1/1     Running                      0          43m
+prometheus      prometheus-pushgateway-5c949bfd75-hpj5c         1/1     Running                      0          43m
+prometheus      prometheus-server-6876b75fbd-9qjc8              2/2     Running                      0          43m
 ```
 
 The sample Flux repository deployed a "cloud native" stack which includes Istio, Kibana, Elastic Search, Jaeger, Elastic Search and others, as can be seen by the namespaces.  
@@ -753,23 +751,23 @@ The sample Flux repository deployed a "cloud native" stack which includes Istio,
 One should note that there is also a namespace `flux`.  As previously mentioned, Flux is managing the deployment of all of the resources into the cluster.  Taking a look at the description for the flux pod `flux-7fb6b99bb4-4xfmk`, we see the following:
 
 ```bash
-kudzu:azure-simple jmspring$ KUBECONFIG=./output/bedrock_kube_config kubectl describe po/flux-7fb6b99bb4-4xfmk --namespace=flux
-Name:               flux-7fb6b99bb4-4xfmk
+kudzu:azure-simple jmspring$ KUBECONFIG=./output/bedrock_kube_config kubectl describe po/flux-7fb6b99bb4-l8xtb --namespace=flux
+Name:               flux-7fb6b99bb4-l8xtb
 Namespace:          flux
 Priority:           0
 PriorityClassName:  <none>
-Node:               aks-default-30249513-0/10.10.1.35
-Start Time:         Thu, 13 Jun 2019 17:38:25 +0000
+Node:               aks-default-30249513-2/10.10.1.159
+Start Time:         Thu, 13 Jun 2019 18:38:26 +0000
 Labels:             app=flux
                     pod-template-hash=7fb6b99bb4
                     release=flux
 Annotations:        <none>
 Status:             Running
-IP:                 10.10.1.45
+IP:                 10.10.1.161
 Controlled By:      ReplicaSet/flux-7fb6b99bb4
 Containers:
   flux:
-    Container ID:  docker://b0f532e17b9ae9f2f3f9ba8b38d5d6deb52b65ebd018a02165a5fa95d5608484
+    Container ID:  docker://57ab8cc87619fbf0ab00fc622817de126f49deaf4026c0870ece2c263860cbba
     Image:         docker.io/weaveworks/flux:1.12.2
     Image ID:      docker-pullable://weaveworks/flux@sha256:368bc5b219feffb1fe00c73cd0f1be7754591f86e17f57bc20371ecba62f524f
     Port:          3030/TCP
@@ -794,7 +792,7 @@ Containers:
       --registry-burst=125
       --registry-trace=false
     State:          Running
-      Started:      Thu, 13 Jun 2019 17:38:46 +0000
+      Started:      Thu, 13 Jun 2019 18:38:59 +0000
     Ready:          True
     Restart Count:  0
     Requests:
@@ -807,7 +805,7 @@ Containers:
       /etc/kubernetes/azure.json from acr-credentials (ro)
       /root/.kubectl from kubedir (rw)
       /var/fluxd/keygen from git-keygen (rw)
-      /var/run/secrets/kubernetes.io/serviceaccount from flux-token-kln4s (ro)
+      /var/run/secrets/kubernetes.io/serviceaccount from flux-token-79l8k (ro)
 Conditions:
   Type              Status
   Initialized       True 
@@ -831,9 +829,9 @@ Volumes:
     Type:          HostPath (bare host directory volume)
     Path:          /etc/kubernetes/azure.json
     HostPathType:  
-  flux-token-kln4s:
+  flux-token-79l8k:
     Type:        Secret (a volume populated by a Secret)
-    SecretName:  flux-token-kln4s
+    SecretName:  flux-token-79l8k
     Optional:    false
 QoS Class:       Burstable
 Node-Selectors:  <none>
@@ -842,27 +840,37 @@ Tolerations:     node.kubernetes.io/not-ready:NoExecute for 300s
 Events:
   Type    Reason     Age   From                             Message
   ----    ------     ----  ----                             -------
-  Normal  Scheduled  16m   default-scheduler                Successfully assigned flux/flux-7fb6b99bb4-4xfmk to aks-default-30249513-0
-  Normal  Pulling    16m   kubelet, aks-default-30249513-0  pulling image "docker.io/weaveworks/flux:1.12.2"
-  Normal  Pulled     16m   kubelet, aks-default-30249513-0  Successfully pulled image "docker.io/weaveworks/flux:1.12.2"
-  Normal  Created    15m   kubelet, aks-default-30249513-0  Created container
-  Normal  Started    15m   kubelet, aks-default-30249513-0  Started container
+  Normal  Scheduled  49m   default-scheduler                Successfully assigned flux/flux-7fb6b99bb4-l8xtb to aks-default-30249513-2
+  Normal  Pulling    49m   kubelet, aks-default-30249513-2  pulling image "docker.io/weaveworks/flux:1.12.2"
+  Normal  Pulled     49m   kubelet, aks-default-30249513-2  Successfully pulled image "docker.io/weaveworks/flux:1.12.2"
+  Normal  Created    49m   kubelet, aks-default-30249513-2  Created container
+  Normal  Started    49m   kubelet, aks-default-30249513-2  Started container
 ```
 
 What is more interesting is to take a look at the Flux logs, one can checkout the activities that `flux` is performing.  A fuller log can be found [here](./extras/flux_log.txt).  But a snippet:
 
 ```bash
-ts=2019-06-13T17:38:46.051780549Z caller=main.go:193 version=1.12.2
-ts=2019-06-13T17:38:46.098282397Z caller=main.go:350 component=cluster identity=/etc/fluxd/ssh/identity
-ts=2019-06-13T17:38:46.098314997Z caller=main.go:351 component=cluster identity.pub="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDTNdGpnmztWRa8RofHl8dIGyNkEayNR6d7p2JtJ7+zMj0HRUJRc+DWvBML4DvT29AumVEuz1bsVyVS2f611NBmXHHKkbzAZZzv9gt2uB5sjnmm7LAORJyoBEodR/T07hWr8MDzYrGo5fdTDVagpoHcEke6JT04AL21vysBgqfLrkrtcgaXsw8e3rkfbqGLbhb6o1muGdEyE+uci4hRVj+FGL9twh3Mb6+0uak/UsTFgfDi/oTXdXOFIitQ1o40Eip6P4xejEOuIye0cg7rfX461NmOP7HIEsUa+BwMExiXXsbxj6Z0TXG0qZaQXWjvZF+MfHx/J0Alb9kdO3pYx3rJbzmdNFwbWM4I/zN+ng4TFiHBWRxRFmqJmKZX6ggJvX/d3z0zvJnvSmOQz9TLOT4lqZ/M1sARtABPGwFLAvPHAkXYnex0v93HUrEi7g9EnM+4dsGU8/6gx0XZUdH17WZ1dbEP7VQwDPnWCaZ/aaG7BsoJj3VnDlFP0QytgVweWr0J1ToTRQQZDfWdeSBvoqq/t33yYhjNA82fs+bR/1MukN0dCWMi7MqIs2t3TKYW635E7VHp++G1DR6w6LoTu1alpAlB7d9qiq7o1c4N+gakXSUkkHL8OQbQBeLeTG1XtYa//A5gnAxLSzxAgBpVW15QywFgJlPk0HEVkOlVd4GzUw=="
-ts=2019-06-13T17:38:46.098341597Z caller=main.go:352 component=cluster host=https://10.0.0.1:443 version=kubernetes-v1.13.5
-ts=2019-06-13T17:38:46.098402798Z caller=main.go:364 component=cluster kubectl=/usr/local/bin/kubectl
-ts=2019-06-13T17:38:46.099412705Z caller=main.go:375 component=cluster ping=true
-ts=2019-06-13T17:38:46.101324019Z caller=main.go:508 url=git@github.com:jmspring/sample_app_manifests.git user="Weave Flux" email=support@weave.works signing-key= sync-tag=flux-sync notes-ref=flux set-author=false
-ts=2019-06-13T17:38:46.10136362Z caller=main.go:565 upstream="no upstream URL given"
-ts=2019-06-13T17:38:46.106052155Z caller=main.go:586 addr=:3030
-ts=2019-06-13T17:38:46.110683589Z caller=images.go:18 component=sync-loop msg="polling images"
-ts=2019-06-13T17:38:46.110842191Z caller=images.go:28 component=sync-loop msg="no automated workloads"
-ts=2019-06-13T17:38:46.111075692Z caller=loop.go:90 component=sync-loop err="git repo not ready: git repo has not been cloned yet"
-ts=2019-06-13T17:38:46.479398247Z caller=checkpoint.go:21 component=checkpoint msg="update available" latest=1.13.0 URL=https://github.com/weaveworks/flux/releases/tag/1.13.0
+KUBECONFIG=./output/bedrock_kube_config kubectl log po/flux-7fb6b99bb4-l8xtb --namespace=flux
+log is DEPRECATED and will be removed in a future version. Use logs instead.
+ts=2019-06-13T18:38:59.332349059Z caller=main.go:193 version=1.12.2
+ts=2019-06-13T18:38:59.381113324Z caller=main.go:350 component=cluster identity=/etc/fluxd/ssh/identity
+ts=2019-06-13T18:38:59.381157125Z caller=main.go:351 component=cluster identity.pub="ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDTNdGpnmztWRa8RofHl8dIGyNkEayNR6d7p2JtJ7+zMj0HRUJRc+DWvBML4DvT29AumVEuz1bsVyVS2f611NBmXHHKkbzAZZzv9gt2uB5sjnmm7LAORJyoBEodR/T07hWr8MDzYrGo5fdTDVagpoHcEke6JT04AL21vysBgqfLrkrtcgaXsw8e3rkfbqGLbhb6o1muGdEyE+uci4hRVj+FGL9twh3Mb6+0uak/UsTFgfDi/oTXdXOFIitQ1o40Eip6P4xejEOuIye0cg7rfX461NmOP7HIEsUa+BwMExiXXsbxj6Z0TXG0qZaQXWjvZF+MfHx/J0Alb9kdO3pYx3rJbzmdNFwbWM4I/zN+ng4TFiHBWRxRFmqJmKZX6ggJvX/d3z0zvJnvSmOQz9TLOT4lqZ/M1sARtABPGwFLAvPHAkXYnex0v93HUrEi7g9EnM+4dsGU8/6gx0XZUdH17WZ1dbEP7VQwDPnWCaZ/aaG7BsoJj3VnDlFP0QytgVweWr0J1ToTRQQZDfWdeSBvoqq/t33yYhjNA82fs+bR/1MukN0dCWMi7MqIs2t3TKYW635E7VHp++G1DR6w6LoTu1alpAlB7d9qiq7o1c4N+gakXSUkkHL8OQbQBeLeTG1XtYa//A5gnAxLSzxAgBpVW15QywFgJlPk0HEVkOlVd4GzUw=="
+ts=2019-06-13T18:38:59.381176226Z caller=main.go:352 component=cluster host=https://10.0.0.1:443 version=kubernetes-v1.13.5
+ts=2019-06-13T18:38:59.381259128Z caller=main.go:364 component=cluster kubectl=/usr/local/bin/kubectl
+ts=2019-06-13T18:38:59.382887867Z caller=main.go:375 component=cluster ping=true
+ts=2019-06-13T18:38:59.386733959Z caller=main.go:508 url=git@github.com:jmspring/sample_app_manifests.git user="Weave Flux" email=support@weave.works signing-key= sync-tag=flux-sync notes-ref=flux set-author=false
+ts=2019-06-13T18:38:59.38677396Z caller=main.go:565 upstream="no upstream URL given"
+ts=2019-06-13T18:38:59.387296272Z caller=main.go:586 addr=:3030
+ts=2019-06-13T18:38:59.387398875Z caller=loop.go:90 component=sync-loop err="git repo not ready: git repo has not been cloned yet"
+ts=2019-06-13T18:38:59.387487077Z caller=images.go:18 component=sync-loop msg="polling images"
+ts=2019-06-13T18:38:59.387695782Z caller=images.go:28 component=sync-loop msg="no automated workloads"
+ts=2019-06-13T18:38:59.79475761Z caller=checkpoint.go:21 component=checkpoint msg="update available" latest=1.13.0 URL=https://github.com/weaveworks/flux/releases/tag/1.13.0
+ts=2019-06-13T18:39:00.028346389Z caller=warming.go:198 component=warmer info="refreshing image" image=gcr.io/google-containers/ip-masq-agent-amd64 tag_count=12 to_update=12 of_which_refresh=0 of_which_missing=12
+ts=2019-06-13T18:39:00.474934606Z caller=warming.go:206 component=warmer updated=gcr.io/google-containers/ip-masq-agent-amd64 successful=12 attempted=12
+ts=2019-06-13T18:39:00.47510221Z caller=images.go:18 component=sync-loop msg="polling images"
+ts=2019-06-13T18:39:00.475146211Z caller=images.go:28 component=sync-loop msg="no automated workloads"
+ts=2019-06-13T18:39:01.631322518Z caller=warming.go:198 component=warmer info="refreshing image" image=containernetworking/azure-npm tag_count=79 to_update=79 of_which_refresh=0 of_which_missing=79
+ts=2019-06-13T18:39:03.427823776Z caller=warming.go:206 component=warmer updated=containernetworking/azure-npm successful=79 attempted=79
 ```
+
+The current Flux Manifest when deployed appears to have some issues in the deployment of the API application.  This document will be updated upon fixes to that.
