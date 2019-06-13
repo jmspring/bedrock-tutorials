@@ -6,6 +6,11 @@ This document walks through the necessary steps to deploy an Bedrock deployment 
 This walkthrough consists of the following:
 
 - [Setting up Prerequisites](#prerequisites)
+- [Configure Terraform For Azure Access](#configure-terraform-for-azure-access)
+- [Clone The Bedrock Repository](#clone-the-bedrock-repository)
+- [Setup Terraform Deployment Variables for Azure Simple](#setup-terraform-deployment-variables-for-azure-simple)
+- [Deploy the Azure Simple Template](#deploy-the-azure-simple-template)
+- [Interact with the Deployed Cluster](#interact-with-the-deployed-cluster)
 
 ## Prerequisites
 
@@ -15,6 +20,7 @@ Prior to getting started with the deployment, there are a couple of required ste
 2. The [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest) needs to be installed.
 3. Cloning and setting up the Flux manifest repository
 4. Creating an [Azure Service Principal](https://github.com/microsoft/bedrock/tree/master/cluster/azure/service-principal)
+5. Creating an RSA key for logging into AKS nodes
 
 Once the above is completed, we walk through the process of configuring Terraform and the Bedrock scripts, deploy the cluster and check on the deployed cluster's health.
 
@@ -96,7 +102,7 @@ Next, on the newly forked repository, select `Settings` -> `Deploy Keys` -> `Add
 Click "Approve" and one should see:
 
 ![approve key](https://raw.githubusercontent.com/jmspring/bedrock-tutorials/master/walkthroughs/azure-simple/images/approve_key.png)
-5d
+
 ### Creating an Azure Service Principal
 
 We will be using a single Azure Service Principal for both configuring Terraform and for use in the AKS cluster being deployed.  In Bedrock, creating a Service Principal is documented [here](https://github.com/microsoft/bedrock/tree/master/cluster/azure#create-an-azure-service-principal).  
@@ -117,7 +123,7 @@ jmspring@kudzu:~$ az account show
     "type": "user"
   }
 }
-jmspring@fubu:~$ az ad sp create-for-rbac --subscription "7060bca0-1234-5-b54c-ab145dfaccef"
+jmspring@kudzu:~$ az ad sp create-for-rbac --subscription "7060bca0-1234-5-b54c-ab145dfaccef"
 {
   "appId": "7b6ab9ae-dead-abcd-8b52-0a8ecb5beef7",
   "displayName": "azure-cli-2019-06-13-04-47-36",
@@ -133,3 +139,65 @@ Take note of the following values, they will be needed for configuring Terraform
 - Tenant Id: `72f984ed-86f1-41af-91ab-87acd01ed3ac`
 - Client Id (appId): `7b6ab9ae-dead-abcd-8b52-0a8ecb5beef7`
 - Client Secret (password): `35591cab-13c9-4b42-8a83-59c8867bbdc2`
+
+### Creating an RSA Key for Logging Into AKS Nodes
+
+As above, we use `ssh-keygen` to generate another RSA keypair.  This key will be used by the Terraform scripts to setup the log in credentials on the nodes in the AKS cluster. We will use this key when going to setup the Terraform deployment variabled.
+
+To generate the key:
+
+```bash
+kudzu:azure-simple jmspring$ ssh-keygen -b 4096 -t rsa -f ~/.ssh/azure-simple-node-key
+Generating public/private rsa key pair.
+Enter passphrase (empty for no passphrase): 
+Enter same passphrase again: 
+Your identification has been saved in /home/jims/.ssh/azure-simple-node-key.
+Your public key has been saved in /home/jims/.ssh/azure-simple-node-key.pub.
+The key fingerprint is:
+SHA256:+8pQ4MuQcf0oKT6LQkyoN6uswApLZQm1xXc+pp4ewvs jims@fubu
+The key's randomart image is:
++---[RSA 4096]----+
+|   ...           |
+|  . o. o .       |
+|.. .. + +        |
+|... .= o *       |
+|+  ++ + S o      |
+|oo=..+ = .       |
+|++ ooo=.o        |
+|B... oo=..       |
+|*+. ..oEo..      |
++----[SHA256]-----+
+```
+
+### Configure Terraform For Azure Access
+
+Terraform supports a number of methods for authenticating with Azure.  The method Bedrock uses is [authenticating with a Service Principa and client secret](https://www.terraform.io/docs/providers/azurerm/auth/service_principal_client_secret.html).  This is done by setting a few environment variables via the Bash `export` command.  To set the variables, we will use the Service Principal defined [above](#creating-an-azure-service-rincipal).
+
+Set the variables as follows:
+
+```bash
+kudzu:azure-simple jmspring$ export ARM_SUBSCRIPTION_ID=7060bca0-1234-5-b54c-ab145dfaccef
+kudzu:azure-simple jmspring$ export ARM_TENANT_ID=72f984ed-86f1-41af-91ab-87acd01ed3ac
+kudzu:azure-simple jmspring$ export kudzu:azure-simple jmspring$ ARM_CLIENT_SECRET=35591cab-13c9-4b42-8a83-59c8867bbdc2
+kudzu:azure-simple jmspring$ export ARM_CLIENT_ID=7b6ab9ae-dead-abcd-8b52-0a8ecb5beef7
+```
+
+If you execute `env | grep ARM` you should see:
+
+```bash
+kudzu:azure-simple jmspring$ env | grep ARM
+ARM_SUBSCRIPTION_ID=7060bca0-1234-5-b54c-ab145dfaccef
+ARM_TENANT_ID=72f984ed-86f1-41af-91ab-87acd01ed3ac
+ARM_CLIENT_SECRET=35591cab-13c9-4b42-8a83-59c8867bbdc2
+ARM_CLIENT_ID=7b6ab9ae-dead-abcd-8b52-0a8ecb5beef7
+```
+
+### Clone The Bedrock Repository
+
+### Setup Terraform Deployment Variables for Azure Simple
+
+
+### Deploy the Azure Simple Template
+
+
+### Interact with the Deployed Cluster
