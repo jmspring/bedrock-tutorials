@@ -750,7 +750,7 @@ prometheus      prometheus-server-6876b75fbd-9st6c              2/2     Running 
 
 The sample Flux repository deployed a "cloud native" stack which includes Istio, Kibana, Elastic Search, Jaeger, Elastic Search and others, as can be seen by the namespaces.  
 
-One should note that there is also a namespace `flux`.  As previously mentioned, Flux is managing the deployment of all of the resources into the cluster.  Taking a look at the description for the flux pod ``, we see the following:
+One should note that there is also a namespace `flux`.  As previously mentioned, Flux is managing the deployment of all of the resources into the cluster.  Taking a look at the description for the flux pod `flux-7fb6b99bb4-4xfmk`, we see the following:
 
 ```bash
 kudzu:azure-simple jmspring$ KUBECONFIG=./output/bedrock_kube_config kubectl describe po/flux-7fb6b99bb4-4xfmk --namespace=flux
