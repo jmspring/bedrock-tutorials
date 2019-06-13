@@ -1,7 +1,13 @@
-## A Walkthrough of Deploying Azure Simple Bedrock Environment
+# A Walkthrough of Deploying Azure Simple Bedrock Environment
 
 This document walks through the necessary steps to deploy an Bedrock deployment using the 
 [Azure Simple](https://github.com/microsoft/bedrock/cluster/environments/azure-simple) environment.  This document will not include the whole of the [gitops](https://github.com/microsoft/bedrock/gitops) workflow.  Instead, this document assumes a pre-existing [Flux Manifest repository](https://github.com/microsoft/bedrock/tree/master/cluster/common/flux) which will be cloned and set up for the needs of this walkthrough.
+
+This walkthrough consists of the following:
+
+- [Setting up Prerequisites](#prerequisites)
+
+## Prerequisites
 
 Prior to getting started with the deployment, there are a couple of required steps:
 
@@ -12,7 +18,6 @@ Prior to getting started with the deployment, there are a couple of required ste
 
 Once the above is completed, we walk through the process of configuring Terraform and the Bedrock scripts, deploy the cluster and check on the deployed cluster's health.
 
-
 ### Installing the required tooling
 
 This document assumes one is running a current version of Ubuntu.  If running some other OS, the steps for installing the software below may differ.
@@ -21,11 +26,9 @@ Per [the Bedrock documentation](https://github.com/microsoft/bedrock/tree/master
 
 A set of scripts to help with this process can be found [here](https://github.com/jmspring/bedrock-dev-env/tree/master/scripts).  These scripts (which were used for this document) install the tools into `/usr/local/bin`.  In this case, one would want to use `setup_kubernetes_tools.sh` and `setup_terraform.sh`.
 
-
 ### Installing the Azure CLI
 
 The Azure CLI install guide can be found [here](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest).  One can also use this [script](https://github.com/jmspring/bedrock-dev-env/blob/master/scripts/setup_azure_cli.sh) to do so (if running on a Unix based machine).
-
 
 ### Cloning and Setting Up a Flux Manifest Repository
 
@@ -34,7 +37,6 @@ As previously mentioned, this document will leverage a pre-existing Flux manifes
 1. Create an RSA keypair for the Flux repository
 2. Fork the repository
 3. Add the keypair to the repository
-
 
 #### Create an RSA Key Pair for a Deploy Key for the Flux Repository
 
@@ -94,5 +96,40 @@ Next, on the newly forked repository, select `Settings` -> `Deploy Keys` -> `Add
 Click "Approve" and one should see:
 
 ![approve key](https://raw.githubusercontent.com/jmspring/bedrock-tutorials/master/walkthroughs/azure-simple/images/approve_key.png)
+5d
+### Creating an Azure Service Principal
 
+We will be using a single Azure Service Principal for both configuring Terraform and for use in the AKS cluster being deployed.  In Bedrock, creating a Service Principal is documented [here](https://github.com/microsoft/bedrock/tree/master/cluster/azure#create-an-azure-service-principal).  
 
+To create a Service Principal, one must [login to the Azure CLI](https://docs.microsoft.com/en-us/cli/azure/authenticate-azure-cli).  First, the Id of the subscription is needed by running `az account show`.  Then the Service Principa is created.  The proces is as follows:
+
+```bash
+jmspring@kudzu:~$ az account show
+{
+  "environmentName": "AzureCloud",
+  "id": "7060bca0-1234-5-b54c-ab145dfaccef",
+  "isDefault": true,
+  "name": "jmspring trial account",
+  "state": "Enabled",
+  "tenantId": "72f984ed-86f1-41af-91ab-87acd01ed3ac",
+  "user": {
+    "name": "jmspring@kudzu.local",
+    "type": "user"
+  }
+}
+jmspring@fubu:~$ az ad sp create-for-rbac --subscription "7060bca0-1234-5-b54c-ab145dfaccef"
+{
+  "appId": "7b6ab9ae-dead-abcd-8b52-0a8ecb5beef7",
+  "displayName": "azure-cli-2019-06-13-04-47-36",
+  "name": "http://azure-cli-2019-06-13-04-47-36",
+  "password": "35591cab-13c9-4b42-8a83-59c8867bbdc2",
+  "tenant": "72f988bf-86f1-41af-91ab-2d7cd011db47"
+}
+```
+
+Take note of the following values, they will be needed for configuring Terraform as well as the deployment later:
+
+- Subscription Id (`id` from account): `7060bca0-1234-5-b54c-ab145dfaccef`
+- Tenant Id: `72f984ed-86f1-41af-91ab-87acd01ed3ac`
+- Client Id (appId): `7b6ab9ae-dead-abcd-8b52-0a8ecb5beef7`
+- Client Secret (password): `35591cab-13c9-4b42-8a83-59c8867bbdc2`
