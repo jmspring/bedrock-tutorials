@@ -40,7 +40,7 @@ Terraform will perform the following actions:
       id:                                         <computed>
       addon_profile.#:                            <computed>
       agent_pool_profile.#:                       "1"
-      agent_pool_profile.0.count:                 "6"
+      agent_pool_profile.0.count:                 "3"
       agent_pool_profile.0.dns_prefix:            <computed>
       agent_pool_profile.0.fqdn:                  <computed>
       agent_pool_profile.0.max_pods:              <computed>
@@ -48,7 +48,7 @@ Terraform will perform the following actions:
       agent_pool_profile.0.os_disk_size_gb:       "30"
       agent_pool_profile.0.os_type:               "Linux"
       agent_pool_profile.0.type:                  "AvailabilitySet"
-      agent_pool_profile.0.vm_size:               "Standard_D4s_v3"
+      agent_pool_profile.0.vm_size:               "Standard_D2s_v3"
       agent_pool_profile.0.vnet_subnet_id:        "${var.vnet_subnet_id}"
       dns_prefix:                                 "testazuresimple"
       fqdn:                                       <computed>
@@ -106,20 +106,20 @@ Do you want to perform these actions?
 
   Enter a value: yes
 
-azurerm_resource_group.cluster_rg: Creating...
-  location: "" => "westus2"
-  name:     "" => "testazuresimplerg"
-  tags.%:   "" => "<computed>"
 module.vnet.azurerm_resource_group.vnet: Creating...
   location: "" => "westus2"
   name:     "" => "testazuresimplerg"
   tags.%:   "" => "<computed>"
-azurerm_resource_group.cluster_rg: Creation complete after 2s (ID: /subscriptions/7060bca0-7a3c-44bd-b54c-...acfac/resourceGroups/testazuresimplerg)
+azurerm_resource_group.cluster_rg: Creating...
+  location: "" => "westus2"
+  name:     "" => "testazuresimplerg"
+  tags.%:   "" => "<computed>"
+module.vnet.azurerm_resource_group.vnet: Creation complete after 3s (ID: /subscriptions/7060bca0-7a3c-44bd-b54c-...acfac/resourceGroups/testazuresimplerg)
+azurerm_resource_group.cluster_rg: Creation complete after 3s (ID: /subscriptions/7060bca0-7a3c-44bd-b54c-...acfac/resourceGroups/testazuresimplerg)
 module.aks-gitops.module.aks.azurerm_resource_group.cluster: Creating...
   location: "" => "westus2"
   name:     "" => "testazuresimplerg"
   tags.%:   "" => "<computed>"
-module.vnet.azurerm_resource_group.vnet: Creation complete after 2s (ID: /subscriptions/7060bca0-7a3c-44bd-b54c-...acfac/resourceGroups/testazuresimplerg)
 module.vnet.azurerm_virtual_network.vnet: Creating...
   address_space.#:     "" => "1"
   address_space.0:     "" => "10.10.0.0/16"
@@ -143,7 +143,7 @@ module.vnet.azurerm_subnet.subnet: Creation complete after 2s (ID: /subscription
 module.aks-gitops.module.aks.azurerm_kubernetes_cluster.cluster: Creating...
   addon_profile.#:                            "" => "<computed>"
   agent_pool_profile.#:                       "" => "1"
-  agent_pool_profile.0.count:                 "" => "6"
+  agent_pool_profile.0.count:                 "" => "3"
   agent_pool_profile.0.dns_prefix:            "" => "<computed>"
   agent_pool_profile.0.fqdn:                  "" => "<computed>"
   agent_pool_profile.0.max_pods:              "" => "<computed>"
@@ -151,7 +151,7 @@ module.aks-gitops.module.aks.azurerm_kubernetes_cluster.cluster: Creating...
   agent_pool_profile.0.os_disk_size_gb:       "" => "30"
   agent_pool_profile.0.os_type:               "" => "Linux"
   agent_pool_profile.0.type:                  "" => "AvailabilitySet"
-  agent_pool_profile.0.vm_size:               "" => "Standard_D4s_v3"
+  agent_pool_profile.0.vm_size:               "" => "Standard_D2s_v3"
   agent_pool_profile.0.vnet_subnet_id:        "" => "/subscriptions/7060bca0-7a3c-44bd-b54c-4bb1e9facfac/resourceGroups/testazuresimplerg/providers/Microsoft.Network/virtualNetworks/testazuresimplevnet/subnets/testazuresimplecluster-aks-subnet"
   dns_prefix:                                 "" => "testazuresimple"
   fqdn:                                       "" => "<computed>"
@@ -214,37 +214,26 @@ module.aks-gitops.aks.azurerm_kubernetes_cluster.cluster: Still creating... (5m0
 module.aks-gitops.aks.azurerm_kubernetes_cluster.cluster: Still creating... (5m10s elapsed)
 module.aks-gitops.aks.azurerm_kubernetes_cluster.cluster: Still creating... (5m20s elapsed)
 module.aks-gitops.aks.azurerm_kubernetes_cluster.cluster: Still creating... (5m30s elapsed)
+
 module.aks-gitops.aks.azurerm_kubernetes_cluster.cluster: Still creating... (5m40s elapsed)
 module.aks-gitops.aks.azurerm_kubernetes_cluster.cluster: Still creating... (5m50s elapsed)
 module.aks-gitops.aks.azurerm_kubernetes_cluster.cluster: Still creating... (6m0s elapsed)
 module.aks-gitops.aks.azurerm_kubernetes_cluster.cluster: Still creating... (6m10s elapsed)
-module.aks-gitops.aks.azurerm_kubernetes_cluster.cluster: Still creating... (6m20s elapsed)
-module.aks-gitops.aks.azurerm_kubernetes_cluster.cluster: Still creating... (6m30s elapsed)
-module.aks-gitops.aks.azurerm_kubernetes_cluster.cluster: Still creating... (6m40s elapsed)
-module.aks-gitops.aks.azurerm_kubernetes_cluster.cluster: Still creating... (6m50s elapsed)
-module.aks-gitops.aks.azurerm_kubernetes_cluster.cluster: Still creating... (7m0s elapsed)
-module.aks-gitops.aks.azurerm_kubernetes_cluster.cluster: Still creating... (7m10s elapsed)
-module.aks-gitops.aks.azurerm_kubernetes_cluster.cluster: Still creating... (7m20s elapsed)
-module.aks-gitops.aks.azurerm_kubernetes_cluster.cluster: Still creating... (7m30s elapsed)
-module.aks-gitops.aks.azurerm_kubernetes_cluster.cluster: Still creating... (7m40s elapsed)
-module.aks-gitops.aks.azurerm_kubernetes_cluster.cluster: Still creating... (7m50s elapsed)
-module.aks-gitops.aks.azurerm_kubernetes_cluster.cluster: Still creating... (8m0s elapsed)
-module.aks-gitops.aks.azurerm_kubernetes_cluster.cluster: Still creating... (8m10s elapsed)
-module.aks-gitops.module.aks.azurerm_kubernetes_cluster.cluster: Creation complete after 8m19s (ID: /subscriptions/7060bca0-7a3c-44bd-b54c-...managedClusters/testazuresimplecluster)
+module.aks-gitops.module.aks.azurerm_kubernetes_cluster.cluster: Creation complete after 6m17s (ID: /subscriptions/7060bca0-7a3c-44bd-b54c-...managedClusters/testazuresimplecluster)
 module.aks-gitops.module.aks.null_resource.cluster_credentials: Creating...
   triggers.%:                   "" => "2"
   triggers.kubeconfig_recreate: "" => ""
   triggers.kubeconfig_to_disk:  "" => "true"
 module.aks-gitops.module.aks.null_resource.cluster_credentials: Provisioning with 'local-exec'...
-module.aks-gitops.module.aks.null_resource.cluster_credentials (local-exec): <------- REMOVED FOR SECRETS ------->
-module.aks-gitops.module.aks.null_resource.cluster_credentials: Creation complete after 0s (ID: 4842828143675104565)
+module.aks-gitops.module.aks.null_resource.cluster_credentials (local-exec): Executing: <------ SENSITIVE DATA ------>
+module.aks-gitops.module.aks.null_resource.cluster_credentials: Creation complete after 0s (ID: 6839616869196222748)
 module.aks-gitops.module.flux.null_resource.deploy_flux: Creating...
   triggers.%:             "" => "2"
   triggers.enable_flux:   "" => "true"
   triggers.flux_recreate: "" => ""
 module.aks-gitops.module.flux.null_resource.deploy_flux: Provisioning with 'local-exec'...
-module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): Executing: ["/bin/sh" "-c" "echo 'Need to use this var so terraform waits for kubeconfig ' 4842828143675104565;KUBECONFIG=./output/bedrock_kube_config /home/jims/code/src/github.com/microsoft/bedrock/cluster/environments/azure-simple/.terraform/modules/7836162b7abd77fba9c644439dc54fd9/deploy_flux.sh -b 'master' -f 'https://github.com/weaveworks/flux.git' -g 'git@github.com:jmspring/sample_app_manifests.git' -k '/home/jims/.ssh/azure-simple-deploy-key' -d 'testazuresimplecluster-flux' -c '5m' -e 'prod' -s 'true' -r 'docker.io/weaveworks/flux' -t '1.12.2'"]
-module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): Need to use this var so terraform waits for kubeconfig  4842828143675104565
+module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): Executing: ["/bin/sh" "-c" "echo 'Need to use this var so terraform waits for kubeconfig ' 6839616869196222748;KUBECONFIG=./output/bedrock_kube_config /home/jims/code/src/github.com/microsoft/bedrock/cluster/environments/azure-simple/.terraform/modules/7836162b7abd77fba9c644439dc54fd9/deploy_flux.sh -b 'master' -f 'https://github.com/weaveworks/flux.git' -g 'git@github.com:jmspring//spartan-cluster-manifests.git' -k '/home/jims/.ssh/azure-simple-deploy-key' -d 'testazuresimplecluster-flux' -c '5m' -e 'prod' -s 'true' -r 'docker.io/weaveworks/flux' -t '1.12.2'"]
+module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): Need to use this var so terraform waits for kubeconfig  6839616869196222748
 module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): flux repo root directory: testazuresimplecluster-flux
 module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): creating testazuresimplecluster-flux directory
 module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): cloning https://github.com/weaveworks/flux.git
@@ -281,6 +270,6 @@ module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): clusterrol
 module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): clusterrolebinding.rbac.authorization.k8s.io/flux created
 module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): service/flux created
 module.aks-gitops.module.flux.null_resource.deploy_flux (local-exec): serviceaccount/flux created
-module.aks-gitops.module.flux.null_resource.deploy_flux: Creation complete after 8s (ID: 541853462335433160)
+module.aks-gitops.module.flux.null_resource.deploy_flux: Creation complete after 8s (ID: 495632976516241457)
 
 Apply complete! Resources: 8 added, 0 changed, 0 destroyed.
