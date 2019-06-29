@@ -28,6 +28,10 @@ Once the above is completed, we walk through the process of configuring Terrafor
 
 This document assumes one is running a current version of Ubuntu.  Windows users can install the [Ubuntu Terminal](https://www.microsoft.com/store/productId/9NBLGGH4MSV6) from the Microsoft Store.  This tool enables Linux command-line utilities, including bash, ssh, git, apt that will be useful for the following deployment.  
 
+You can also turn on Windows Subsystem for Linux in settings:
+
+![Windows Subsystem for Linux](./images/WinSubsysLinux.png)
+
 Per Step 1. in [Prerequisites](#prerequisites) and [the Bedrock documentation](https://github.com/microsoft/bedrock/tree/master/cluster#required-tools), one must install `helm`, `terraform` and `kubectl`.  There are links for each in the documentation.
 
 There is also a set of [scripts](https://github.com/jmspring/bedrock-dev-env/tree/master/scripts) that will install `helm`, `terraform` and `kubectl`.  In this case, one would want to use `setup_kubernetes_tools.sh` and `setup_terraform.sh`.  These scripts, which were used for this document, install the tools into `/usr/local/bin`.  
@@ -265,7 +269,7 @@ At this point, we have values for `service_principal_id`, `service_principal_sec
 
 To get the gitopp_ssh_url, go back to sample application repository that was previously cloned in [Forking the Repository](#forking-the-repository).  Click **Clone or download**, and select **Use SSH**.
 
-![use ssh](../images/use-ssh.png)
+![use ssh](./images/use-ssh.png)
 
 Define the remainding fields:
 
