@@ -28,7 +28,7 @@ Once the above is completed, we walk through the process of configuring Terrafor
 
 This document assumes one is running a current version of Ubuntu.  Windows users can install the [Ubuntu Terminal](https://www.microsoft.com/store/productId/9NBLGGH4MSV6) from the Microsoft Store.  This tool enables Linux command-line utilities, including bash, ssh, git, apt that will be useful for the following deployment.  
 
-Per Step 1. in **Prerequisites** and [the Bedrock documentation](https://github.com/microsoft/bedrock/tree/master/cluster#required-tools), one must install `helm`, `terraform` and `kubectl`.  There are links for each in the documentation.
+Per Step 1. in [Prerequisites](#prerequisites) and [the Bedrock documentation](https://github.com/microsoft/bedrock/tree/master/cluster#required-tools), one must install `helm`, `terraform` and `kubectl`.  There are links for each in the documentation.
 
 There is also a set of [scripts](https://github.com/jmspring/bedrock-dev-env/tree/master/scripts) that will install `helm`, `terraform` and `kubectl`.  In this case, one would want to use `setup_kubernetes_tools.sh` and `setup_terraform.sh`.  These scripts, which were used for this document, install the tools into `/usr/local/bin`.  
 
@@ -74,7 +74,7 @@ The key's randomart image is:
 kudzu:azure-simple jmspring$ 
 ```
 
-This will create public and private keys for the Flux repository. We will assign the public key under the following heading: **Adding the Repository Key**.
+This will create public and private keys for the Flux repository. We will assign the public key under the following heading: [Adding the Repository Key](#adding-the-repository-key).
 
 #### Forking the Repository
 
@@ -133,7 +133,7 @@ jmspring@kudzu:~$ az ad sp create-for-rbac --subscription "7060bca0-1234-5-b54c-
 }
 ```
 
-Take note of the following values, they will be needed for configuring Terraform as well as the deployment under the heading **Configure Terraform For Azure Access**:
+Take note of the following values, they will be needed for configuring Terraform as well as the deployment under the heading [Configure Terraform for Azure Access](#configure-terraform-for-azure-access):
 
 - Subscription Id (`id` from account): `7060bca0-1234-5-b54c-ab145dfaccef`
 - Tenant Id: `72f984ed-86f1-41af-91ab-87acd01ed3ac`
@@ -171,7 +171,7 @@ The key's randomart image is:
 
 ### Configure Terraform For Azure Access
 
-Terraform supports a number of methods for authenticating with Azure.  The method Bedrock uses is [authenticating with a Service Principal and client secret](https://www.terraform.io/docs/providers/azurerm/auth/service_principal_client_secret.html).  This is done by setting a few environment variables via the Bash `export` command.  To set the variables, we will use the key created under the previous heading **Creating an Azure Service Principal**.
+Terraform supports a number of methods for authenticating with Azure.  The method Bedrock uses is [authenticating with a Service Principal and client secret](https://www.terraform.io/docs/providers/azurerm/auth/service_principal_client_secret.html).  This is done by setting a few environment variables via the Bash `export` command.  To set the variables, we will use the key created under the previous heading [Creating an Azure Service Principal](#creating-an-azure-service-principal).
 
 Set the variables as follows:
 
