@@ -82,7 +82,7 @@ This will create public and private keys for the Flux repository. We will assign
 
 #### Forking the Repository
 
-To fork the repository, click [here](https://github.com/andrebriggs/sample_app_manifests/tree/master/prod).  You should see:
+To fork the repository, use the [sample manifests](https://github.com/andrebriggs/sample_app_manifests/tree/master/prod) as shown following:
 
 ![initial repository](https://raw.githubusercontent.com/jmspring/bedrock-tutorials/master/walkthroughs/azure-simple/images/initial_repository.png)
 
@@ -92,14 +92,16 @@ Click "Fork" and you should see something resembling:
 
 #### Adding Repository Key
 
-Previously an [RSA key pair was created](#create-an-rsa-key-pair-for-a-deploy-key-for-the-flux-repository).  The public key needs to be added as a deploy key.  First, display the contents of the public key:
+The public key of the [RSA key pair](#create-an-rsa-key-pair-for-a-deploy-key-for-the-flux-repository) previously created needs to be added as a deploy key.  
+
+First, display the contents of the public key: `more ~/.ssh/azure-simple-deploy-key.pub`.
 
 ```bash
 kudzu:azure-simple jmspring$ more ~/.ssh/azure-simple-deploy-key.pub 
 ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDTNdGpnmztWRa8RofHl8dIGyNkEayNR6d7p2JtJ7+zMj0HRUJRc+DWvBML4DvT29AumVEuz1bsVyVS2f611NBmXHHKkbzAZZzv9gt2uB5sjnmm7LAORJyoBEodR/T07hWr8MDzYrGo5fdTDVagpoHcEke6JT04AL21vysBgqfLrkrtcgaXsw8e3rkfbqGLbhb6o1muGdEyE+uci4hRVj+FGL9twh3Mb6+0uak/UsTFgfDi/oTXdXOFIitQ1o40Eip6P4xejEOuIye0cg7rfX461NmOP7HIEsUa+BwMExiXXsbxj6Z0TXG0qZaQXWjvZF+MfHx/J0Alb9kdO3pYx3rJbzmdNFwbWM4I/zN+ng4TFiHBWRxRFmqJmKZX6ggJvX/d3z0zvJnvSmOQz9TLOT4lqZ/M1sARtABPGwFLAvPHAkXYnex0v93HUrEi7g9EnM+4dsGU8/6gx0XZUdH17WZ1dbEP7VQwDPnWCaZ/aaG7BsoJj3VnDlFP0QytgVweWr0J1ToTRQQZDfWdeSBvoqq/t33yYhjNA82fs+bR/1MukN0dCWMi7MqIs2t3TKYW635E7VHp++G1DR6w6LoTu1alpAlB7d9qiq7o1c4N+gakXSUkkHL8OQbQBeLeTG1XtYa//A5gnAxLSzxAgBpVW15QywFgJlPk0HEVkOlVd4GzUw== jmspring@kudzu.local
 ```
 
-Next, on the newly forked repository, select `Settings` -> `Deploy Keys` -> `Add deploy key`.  Next, give your key a title and paste in the contents of your public key.  Also, allow the key to have `Write Access`.  When complete the screen should resemble:
+Next, on the newly forked repository, select `Settings` -> `Deploy Keys` -> `Add deploy key`.  Give your key a title and paste in the contents of your public key.  Important: allow the key to have `Write Access`.  When complete, the screen should resemble:
 
 ![enter key](./images/enter_key.png)
 
@@ -111,7 +113,11 @@ Click "Approve" and one should see:
 
 We will be using a single [Azure Service Principal](https://docs.microsoft.com/en-us/azure/active-directory/develop/app-objects-and-service-principals) for both configuring Terraform and for use in the [Azure Kubernetes Service (AKS)](https://azure.microsoft.com/en-us/services/kubernetes-service/) cluster being deployed.  In Bedrock, see the [Service Principal documention](https://github.com/microsoft/bedrock/tree/master/cluster/azure#create-an-azure-service-principal).  
 
-To create a Service Principal, one must [login to the Azure CLI](https://docs.microsoft.com/en-us/cli/azure/authenticate-azure-cli).  First, log in using `az login` command.  Get the Id of the subscription by running `az account show`.  Then the Service Principal is created using `az ad sp create-for-rbac --subscription "7060bca0-1234-5-b54c-ab145dfaccef"`.  The process is as follows:
+To create a Service Principal, one must [login to the Azure CLI](https://docs.microsoft.com/en-us/cli/azure/authenticate-azure-cli).  First, log in using the `az login` command.  
+
+Get the Id of the subscription by running `az account show`. 
+
+Then, create the Service Principal using `az ad sp create-for-rbac --subscription "7060bca0-1234-5-b54c-ab145dfaccef"` as follows:
 
 ```bash
 jmspring@kudzu:~$ az account show
@@ -137,7 +143,7 @@ jmspring@kudzu:~$ az ad sp create-for-rbac --subscription "7060bca0-1234-5-b54c-
 }
 ```
 
-Take note of the following values, they will be needed for configuring Terraform as well as the deployment under the heading [Configure Terraform for Azure Access](#configure-terraform-for-azure-access):
+Take note of the following values.  They will be needed for configuring Terraform as well as the deployment as described under the heading [Configure Terraform for Azure Access](#configure-terraform-for-azure-access):
 
 - Subscription Id (`id` from account): `7060bca0-1234-5-b54c-ab145dfaccef`
 - Tenant Id: `72f984ed-86f1-41af-91ab-87acd01ed3ac`
@@ -146,7 +152,7 @@ Take note of the following values, they will be needed for configuring Terraform
 
 ### Creating an RSA Key for Logging Into AKS Nodes
 
-As above, we use `ssh-keygen` to generate another RSA keypair.  This key will be used by the Terraform scripts to setup the log-in credentials on the nodes in the AKS cluster. We will use this key when setting up the Terraform deployment `variabled`.
+As previously, we use `ssh-keygen` to generate another RSA keypair.  The Terraform scripts use this key to setup log-in credentials on the nodes in the AKS cluster. We will use this key when setting up the Terraform deployment `variabled`.
 
 To generate the key, run `ssh-keygen -b 4096 -t rsa -f ~/.ssh/azure-simple-node-key`:
 
@@ -175,7 +181,9 @@ The key's randomart image is:
 
 ### Configure Terraform For Azure Access
 
-Terraform supports a number of methods for authenticating with Azure.  The method Bedrock uses is [authenticating with a Service Principal and client secret](https://www.terraform.io/docs/providers/azurerm/auth/service_principal_client_secret.html).  This is done by setting a few environment variables via the Bash `export` command.  To set the variables, we will use the key created under the previous heading [Creating an Azure Service Principal](#creating-an-azure-service-principal).
+Terraform supports a number of methods for authenticating with Azure.  Bedrock uses [authenticating with a Service Principal and client secret](https://www.terraform.io/docs/providers/azurerm/auth/service_principal_client_secret.html).  This is done by setting a few environment variables via the Bash `export` command.  
+
+To set the variables, we use the key created under the previous heading [Creating an Azure Service Principal](#creating-an-azure-service-principal).  (The ARM_CLIENT_ID is `app_id` from the previous procedure.  The ARM_SUBSCRIPTION_ID is account `id`.)
 
 Set the variables as follows:
 
@@ -198,7 +206,7 @@ ARM_CLIENT_ID=7b6ab9ae-dead-abcd-8b52-0a8ecb5beef7
 
 ### Clone The Bedrock Repository
 
-Use the [Bedrock repository](https://github.com/microsoft/bedrock).  Clone it, with the `git` command:
+Use the [Bedrock repository](https://github.com/microsoft/bedrock).  Clone it with the `git` command: `git clone https://github.com/microsoft/bedrock.git`
 
 ```bash
 kudzu:azure-simple jmspring$ git clone https://github.com/microsoft/bedrock.git
@@ -211,7 +219,7 @@ Receiving objects: 100% (2154/2154), 29.33 MiB | 6.15 MiB/s, done.
 Resolving deltas: 100% (1022/1022), done.
 ```
 
-To verify, navigate to the `bedrock/cluster/environments` directory and do an `ls`:
+To verify, navigate to the `bedrock/cluster/environments` directory and do an `ls` command:
 
 ```bash
 kudzu:environments jmspring$ ls -l
@@ -228,7 +236,7 @@ Each of the directories represent a common pattern supported within Bedrock.  Yo
 
 ### Setup Terraform Deployment Variables for Azure Simple
 
-As mentioned, we will be using `azure-simple`, changing into that directory and doing an `ls` reveals:
+As mentioned, we will be using `azure-simple`. Changing to that directory and doing an `ls` command reveals:
 
 ```bash
 kudzu:environments jmspring$ cd azure-simple
@@ -240,7 +248,7 @@ total 32
 -rw-r--r--  1 jmspring  staff  2465 Jun 12 09:11 variables.tf
 ```
 
-The inputs for a Terraform deployment are typically specified in a `.tfvars` file.  In the `azure-simple` repository, a skeleton exists in the form of `terraform.tfvars`.  The contents of `terraform.tfvars` is as follows:
+The inputs for a Terraform deployment are typically specified in a `.tfvars` file.  In the `azure-simple` repository, a skeleton exists in the form of `terraform.tfvars` with the following fields:
 
 ```bash
 kudzu:azure-simple jmspring$ cat terraform.tfvars
@@ -265,9 +273,9 @@ vnet_name = "<vnet name>"
 # network_policy = "calico"
 ```
 
-At this point, we have values for `service_principal_id`, `service_principal_secret`, `ssh_public_key`, `gitops_ssh_key`.  For purposes of this walkthrough, `agent_vm_count` and `resource_group_location` are reasonable defaults. 
+From previous procedures, we have values for `service_principal_id`, `service_principal_secret`, `ssh_public_key`, `gitops_ssh_key`.  For purposes of this walkthrough the defaults for `agent_vm_count=3` and `resource_group_location=westus2` are usable. 
 
-To get the gitopp_ssh_url, go back to sample application repository that was previously cloned in [Forking the Repository](#forking-the-repository).  Click **Clone or download**, and select **Use SSH**.
+To get the gitopp_ssh_url, go back to the sample repository that was cloned in [Forking the Repository](#forking-the-repository).  Click **Clone or download**, and select **Use SSH**.
 
 ![use ssh](./images/use-ssh.png)
 
@@ -315,13 +323,13 @@ Note that our Flux deployment manifests are actually in a sub-directory within o
 
 ### Deploy the Azure Simple Template
 
-With the Terraform variables file created, [testazuresimple.tfvars] (#setup-terraform-deployment-variables-for-azure-simple), it is time to do the Terraform deployment.  There are a couple of steps to this process:
+With the Terraform variables file created, [testazuresimple.tfvars] (#setup-terraform-deployment-variables-for-azure-simple), it is time to do the Terraform deployment.  There are three steps to this process:
 
 - `terraform init` which initializes the local directory with metadata and other necessities Terraform needs.
 - `terraform plan` which sanity checks your variables against the deployment
 - `terraform apply` which actually deploys the infrastructure defined
 
-Make sure one is in the `bedrock/cluster/environments/azure-simple` directory and that you know the path to `testazuresimple.tfvars` (it is assumed that is in the same directory as the `azure-simple` environment).
+Make sure you are in the `bedrock/cluster/environments/azure-simple` directory and that you know the path to `testazuresimple.tfvars` (it is assumed that is in the same directory as the `azure-simple` environment).
 
 First execute `terraform init`:
 
@@ -359,16 +367,16 @@ Initializing provider plugins...
 
 Terraform has been successfully initialized!
 
-You may now begin working with Terraform. Try running "terraform plan" to see
-any changes that are required for your infrastructure. All Terraform commands
-should now work.
+You may now begin working with Terraform. All Terraform commands
+should work. Try running "terraform plan" to see
+any changes that are required for your infrastructure. 
 
 If you ever set or change modules or backend configuration for Terraform,
 rerun this command to reinitialize your working directory. If you forget, other
 commands will detect it and remind you to do so if necessary.
 ```
 
-Next, execute `terraform plan` and specify the location of our variables file:
+Next, execute `terraform plan` and specify the location of our variables file: `kudzu:azure-simple jmspring$ terraform plan -var-file=testazuresimple.tfvars`
 
 ```bash
 kudzu:azure-simple jmspring$ terraform plan -var-file=testazuresimple.tfvars 
@@ -490,7 +498,9 @@ can't guarantee that exactly these actions will be performed if
 
 As seen from the output, a number of objects have been defined for creation.
 
-The final step is to issue `terraform apply` which also requires the file containing the variables we defined above.  The output for `terraform apply` is quite long, so the snippet below will only contain the beginning and the end, the full output is [here](./extras/terraform_apply_log.txt) (sensitive output has been removed).  Note the beginning looks similar to `terraform plan` and the output contains the status of deploying each component.  Based on dependencies, Terraform deploys components in the proper order derived from a dependency graph.
+The final step is to issue `terraform apply -var-file=testazuresimple.tfvars` which uses the file containing the variables we defined above (if you run `terraform apply` without `-var-file=` it will take any `*.tfvars` file in the folder, for example, the sample *terraform.tfvars* file, if you didn't remove it, and start asking for the unspecified fields).  
+
+The output for `terraform apply` is quite long, so the snippet below contains only the beginning and the end (sensitive output has been removed).  The full output can be found in [./extras/terraform_apply_log.txt](./extras/terraform_apply_log.txt).  Note the beginning looks similar to `terraform plan` and the output contains the status of deploying each component.  Based on dependencies, Terraform deploys components in the proper order derived from a dependency graph.
 
 ```bash
 kudzu:azure-simple jmspring$ terraform apply -var-file=testazuresimple.tfvars 
