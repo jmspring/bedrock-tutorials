@@ -284,7 +284,7 @@ Note that the, `gitops_ssh_key` is a *path* to the RSA private key we created un
 
 The `ssh_public_key` is the RSA public key that was created for [AKS node access](#creating-an-rsa-key-for-logging-into-aks-nodes).
 
-Make a copy of the `terraform.tfvars` file and name it `testazuresimple.tfvars` for a working copy.  Next, using the values just defined, fill in the other values that were generated.
+Make a copy of the `terraform.tfvars` file and name it `testazuresimple.tfvars` for a working copy.  Next, using the values just defined, fill in the other values that were generated.  Then, remove the old terraform.tfvars file.  
 
 When complete `testazuresimple.tfvars` should resemble:
 
