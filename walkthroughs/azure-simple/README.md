@@ -1,7 +1,7 @@
 # A Walkthrough of Deploying Azure Simple Bedrock Environment
 
 This document walks through the necessary steps to deploy a Bedrock deployment using the 
-[Azure Simple](https://github.com/microsoft/bedrock/cluster/environments/azure-simple) environment.  This document will not include the whole of the [gitops](https://github.com/microsoft/bedrock/gitops) workflow.  Instead, this document assumes a pre-existing [Flux Manifest repository](https://github.com/microsoft/bedrock/tree/master/cluster/common/flux) which will be cloned and set up for the needs of this walkthrough.
+[Azure Simple](https://github.com/microsoft/bedrock/cluster/environments/azure-simple) environment.  It does not include the whole [gitops](https://github.com/microsoft/bedrock/gitops) workflow.  Instead, we assume a pre-existing [Flux Manifest repository](https://github.com/microsoft/bedrock/tree/master/cluster/common/flux) which will be cloned and set up for the needs of this walkthrough.
 
 This walkthrough consists of the following:
 
@@ -14,15 +14,15 @@ This walkthrough consists of the following:
 
 ## Prerequisites
 
-Prior to getting started with the deployment, there are a couple of required steps:
+Prior to starting the deployment, there are several required steps:
 
-1. The required common tools (kubectl, helm, and terraform) need to be installed.  That process is talked about [here](https://github.com/microsoft/bedrock/tree/master/cluster). This tutorial currently uses [Terraform 0.11.13](https://releases.hashicorp.com/terraform/0.11.13/).
-2. The [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest) needs to be installed.
-3. Cloning and setting up the Flux manifest repository
-4. Creating an [Azure Service Principal](https://github.com/microsoft/bedrock/tree/master/cluster/azure/service-principal)
-5. Creating an RSA key for logging into AKS nodes
+1. Install the required common tools (kubectl, helm, and terraform).  See also [Required Tools](https://github.com/microsoft/bedrock/tree/master/cluster). Note: this tutorial currently uses [Terraform 0.11.13](https://releases.hashicorp.com/terraform/0.11.13/).
+2. Install the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest).
+3. Clone and set up the [Flux manifest repository](#cloning-and-setting-up-a-flux-manifest-repository).
+4. Create an [Azure Service Principal](https://github.com/microsoft/bedrock/tree/master/cluster/azure/service-principal).
+5. Create an [RSA key for logging into AKS nodes](creating-an-rsa-key-for-logging-into-aks-nodes).
 
-Once the above is completed, we walk through the process of configuring Terraform and the Bedrock scripts, deploy the cluster and check on the deployed cluster's health.
+The following procedures complete the prerequisites then walk through the process of configuring Terraform and Bedrock scripts, deploying the cluster, and checking the deployed cluster's health.
 
 ### Installing the required tooling
 
@@ -38,11 +38,11 @@ There is also a set of [scripts](https://github.com/jmspring/bedrock-dev-env/tre
 
 ### Installing the Azure CLI
 
-The Azure CLI install guide can be found [here](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest).  One can also use this [script](https://github.com/jmspring/bedrock-dev-env/blob/master/scripts/setup_azure_cli.sh) to do so (if running on a Unix based machine).
+For information specific to your operating system, see the [Azure CLI install guide](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest).  You can also use [this script](https://github.com/jmspring/bedrock-dev-env/blob/master/scripts/setup_azure_cli.sh) if running on a Unix based machine.
 
 ### Cloning and Setting Up a Flux Manifest Repository
 
-As mentioned, this document will leverage a pre-existing Flux manifest repository.  However, there is still a bit of work to do.  To use the [repository](https://github.com/andrebriggs/sample_app_manifests/tree/master/prod), we must:
+As mentioned, this document will leverage a pre-existing Flux manifest repository.  However, there is still a bit of work to do.  To use the [Flux repository](https://github.com/andrebriggs/sample_app_manifests/tree/master/prod), we must:
 
 1. Create an RSA keypair for the Flux repository
 2. Fork the repository
@@ -52,7 +52,7 @@ As mentioned, this document will leverage a pre-existing Flux manifest repositor
 
 The [deploy key](https://developer.github.com/v3/guides/managing-deploy-keys/#deploy-keys) is generated using `ssh-keygen`.  The public portion will be installed as a deploy key once the repository is forked.
 
-To generate the key:
+To generate the key, run: `ssh-keygen -b 4096 -t rsa -f ~/.ssh/azure-simple-deploy-key'.
 
 ```bash
 kudzu:azure-simple jmspring$ ssh-keygen -b 4096 -t rsa -f ~/.ssh/azure-simple-deploy-key
@@ -78,7 +78,7 @@ The key's randomart image is:
 kudzu:azure-simple jmspring$ 
 ```
 
-This will create public and private keys for the Flux repository. We will assign the public key under the following heading: [Adding the Repository Key](#adding-the-repository-key).
+This will create public and private keys for the Flux repository. We will assign the public key under the following heading: [Adding the Repository Key](#adding-the-repository-key).  The private key is stored on the machine originating the deployment.
 
 #### Forking the Repository
 
