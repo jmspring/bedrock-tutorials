@@ -288,7 +288,7 @@ Define the remainding fields:
 
 For this tutorial, given the GitHub user `jmspring`, the `gitops_ssh_url` value is `git@github.com:jmspring/sample_app_manifests.git` previously [cloned](#forking-the-repository) and obtained as shown above.  
 
-Note that the, `gitops_ssh_key` is a *path* to the RSA private key we created under the heading[Create an RSA Key Pair for a Deploy Key for the Flux Repository](Create an RSA key pair for a deploy-key-for-the-flux-repository)
+Note that the, `gitops_ssh_key` is a *path* to the RSA private key we created under the heading[Create an RSA Key Pair for a Deploy Key for the Flux Repository](#create-an-rsa-key-pair-for-a-deploy-key-for-the-flux-repository)
 
 The `ssh_public_key` is the RSA public key that was created for [AKS node access](#creating-an-rsa-key-for-logging-into-aks-nodes).
 
@@ -696,9 +696,9 @@ module.aks-gitops.module.flux.null_resource.deploy_flux: Creation complete after
 Apply complete! Resources: 8 added, 0 changed, 0 destroyed.
 ```
 
-The results of `terraform apply` are enumerated in the `terraform.tfstate` file. For an overview resources created, run `terraform state list`:
+The results of `terraform apply` are enumerated in the `terraform.tfstate` file. For an overview of resources created, run `terraform state list`:
 ```bash
-~/bedrock/cluster/environments/azure-simple$ terraform state list                         
+~/bedrock/cluster/environments/azure-simple$ terraform state list                      
 
 azurerm_resource_group.cluster_rg
 module.aks-gitops.module.aks.azurerm_kubernetes_cluster.cluster
@@ -711,7 +711,7 @@ module.vnet.azurerm_virtual_network.vnet
 ```
 To see all the details, run `terraform show`
 
-To see one element, for example, run `terraform show module.vnet.azurerm_virtual_network.vnet`:
+To see one element, for example, run `terraform state show module.vnet.azurerm_virtual_network.vnet`:
 ```bash
 ~/bedrock/cluster/environments/azure-simple$ terraform state show module.vnet.azurerm_virtual_network.vnet
 id                     = /subscriptions/b59451c1-cd43-41b3-b3a4-74155d8f6cf6/resourceGroups/mike-dodaro-tst-az-simple-rg/providers/Microsoft.Network/virtualNetworks/testazuresimplevnet
