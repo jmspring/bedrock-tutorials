@@ -700,7 +700,14 @@ The results of `terraform apply` are enumerated in the `terraform.tfstate` file.
 ```bash
 ~/bedrock/cluster/environments/azure-simple$ terraform state list                         
 
-azurerm_resource_group.cluster_rg                                                                                     module.aks-gitops.module.aks.azurerm_kubernetes_cluster.cluster                                                       module.aks-gitops.module.aks.azurerm_resource_group.cluster                                                           module.aks-gitops.module.aks.null_resource.cluster_credentials                                                        module.aks-gitops.module.flux.null_resource.deploy_flux                                                               module.vnet.azurerm_resource_group.vnet                                                                               module.vnet.azurerm_subnet.subnet                                                                                     module.vnet.azurerm_virtual_network.vnet
+azurerm_resource_group.cluster_rg
+module.aks-gitops.module.aks.azurerm_kubernetes_cluster.cluster
+module.aks-gitops.module.aks.azurerm_resource_group.cluster
+module.aks-gitops.module.aks.null_resource.cluster_credentials
+module.aks-gitops.module.flux.null_resource.deploy_flux
+module.vnet.azurerm_resource_group.vnet
+module.vnet.azurerm_subnet.subnet
+module.vnet.azurerm_virtual_network.vnet
 ```
 To see all the details, run `terraform show`
 
