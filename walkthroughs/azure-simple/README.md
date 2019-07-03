@@ -714,14 +714,14 @@ To see all the details, run `terraform show`
 To see one element, for example, run `terraform state show module.vnet.azurerm_virtual_network.vnet`:
 ```bash
 ~/bedrock/cluster/environments/azure-simple$ terraform state show module.vnet.azurerm_virtual_network.vnet
-id                     = /subscriptions/b59451c1-cd43-41b3-b3a4-74155d8f6cf6/resourceGroups/mike-dodaro-tst-az-simple-rg/providers/Microsoft.Network/virtualNetworks/testazuresimplevnet
+id                     = /subscriptions/b59451c1-cd43-41b3-b3a4-74155d8f6cf6/resourceGroups/tst-az-simple-rg/providers/Microsoft.Network/virtualNetworks/testazuresimplevnet
 address_space.#        = 1
 address_space.0        = 10.10.0.0/16
 ddos_protection_plan.# = 0
 dns_servers.#          = 0
 location               = westus2
 name                   = testazuresimplevnet
-resource_group_name    = mike-dodaro-tst-az-simple-rg
+resource_group_name    = tst-az-simple-rg
 subnet.#               = 0
 tags.%                 = 1
 tags.environment       = azure-simple
