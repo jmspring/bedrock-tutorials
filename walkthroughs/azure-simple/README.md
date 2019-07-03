@@ -711,7 +711,7 @@ module.vnet.azurerm_virtual_network.vnet
 ```
 To see all the details, run `terraform show`
 
-To see one element, for example, run `terraform show` module.vnet.azurerm_virtual_network.vnet:
+To see one element, for example, run `terraform show module.vnet.azurerm_virtual_network.vnet`:
 ```bash
 ~/bedrock/cluster/environments/azure-simple$ terraform state show module.vnet.azurerm_virtual_network.vnet
 id                     = /subscriptions/b59451c1-cd43-41b3-b3a4-74155d8f6cf6/resourceGroups/mike-dodaro-tst-az-simple-rg/providers/Microsoft.Network/virtualNetworks/testazuresimplevnet
