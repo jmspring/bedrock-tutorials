@@ -696,11 +696,34 @@ module.aks-gitops.module.flux.null_resource.deploy_flux: Creation complete after
 Apply complete! Resources: 8 added, 0 changed, 0 destroyed.
 ```
 
-After `terraform apply` finishes, there is one critical output artifact.  In the `output` directory that was generated is the Kubernetes config file for the deployed cluster.  The default file is `output/bedrock_kube_config`.  This file will be needed for the following steps.
+The results of `terraform apply` are enumerated in the `terraform.tfstate` file. For an overview resources created, run `terraform state list`:
+```bash
+~/bedrock/cluster/environments/azure-simple$ terraform state list                         
+
+azurerm_resource_group.cluster_rg                                                                                     module.aks-gitops.module.aks.azurerm_kubernetes_cluster.cluster                                                       module.aks-gitops.module.aks.azurerm_resource_group.cluster                                                           module.aks-gitops.module.aks.null_resource.cluster_credentials                                                        module.aks-gitops.module.flux.null_resource.deploy_flux                                                               module.vnet.azurerm_resource_group.vnet                                                                               module.vnet.azurerm_subnet.subnet                                                                                     module.vnet.azurerm_virtual_network.vnet
+```
+To see all the details, run `terraform show`
+
+To see one element, for example, run `terraform show` module.vnet.azurerm_virtual_network.vnet:
+```bash
+~/bedrock/cluster/environments/azure-simple$ terraform state show module.vnet.azurerm_virtual_network.vnet
+id                     = /subscriptions/b59451c1-cd43-41b3-b3a4-74155d8f6cf6/resourceGroups/mike-dodaro-tst-az-simple-rg/providers/Microsoft.Network/virtualNetworks/testazuresimplevnet
+address_space.#        = 1
+address_space.0        = 10.10.0.0/16
+ddos_protection_plan.# = 0
+dns_servers.#          = 0
+location               = westus2
+name                   = testazuresimplevnet
+resource_group_name    = mike-dodaro-tst-az-simple-rg
+subnet.#               = 0
+tags.%                 = 1
+tags.environment       = azure-simple
+```
 
 ### Interact with the Deployed Cluster
+After `terraform apply` finishes, there is one critical output artifact: the Kubernetes config file for the deployed cluster that is generated and saved in the `output` directory.  The default file is `output/bedrock_kube_config`.  The following steps use this file to interact with the deployed Bedrock AKS cluster.  
 
-Upon the deployment of the Bedrock AKS cluster, it is possible to start interacting with it.  Using the config file `output/bedrock_kube_config`, one of the first things we can do is list all pods deployed within the cluster:
+Using the config file `output/bedrock_kube_config`, one of the first things we can do is list all pods deployed within the cluster:
 
 ```bash
 KUBECONFIG=./output/bedrock_kube_config kubectl get po --all-namespaces
