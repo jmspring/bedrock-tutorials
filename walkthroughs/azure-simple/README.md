@@ -21,6 +21,7 @@ Prior to starting the deployment, there are several required steps:
 3. Clone and set up the [Flux manifest repository](#cloning-and-setting-up-a-flux-manifest-repository).
 4. Create an [Azure Service Principal](https://github.com/microsoft/bedrock/tree/master/cluster/azure/service-principal).
 5. Create an [RSA key for logging into AKS nodes](creating-an-rsa-key-for-logging-into-aks-nodes).
+6. Enroll as an Azure subscriber.  The free trial subscription does not support enough cores to run this tutorial.
 
 The following procedures complete the prerequisites then walk through the process of configuring Terraform and Bedrock scripts, deploying the cluster, and checking the deployed cluster's health.
 
