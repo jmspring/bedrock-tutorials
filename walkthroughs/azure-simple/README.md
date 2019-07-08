@@ -17,11 +17,11 @@ This walkthrough consists of the following:
 Prior to starting the deployment, there are several required steps:
 
 1. Install the required common tools (kubectl, helm, and terraform).  See also [Required Tools](https://github.com/microsoft/bedrock/tree/master/cluster). Note: this tutorial currently uses [Terraform 0.11.13](https://releases.hashicorp.com/terraform/0.11.13/).
-2. Install the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest).
-3. Clone and set up the [Flux manifest repository](#cloning-and-setting-up-a-flux-manifest-repository).
-4. Create an [Azure Service Principal](https://github.com/microsoft/bedrock/tree/master/cluster/azure/service-principal).
-5. Create an [RSA key for logging into AKS nodes](creating-an-rsa-key-for-logging-into-aks-nodes).
-6. Enroll as an Azure subscriber.  The free trial subscription does not support enough cores to run this tutorial.
+2. Enroll as an Azure subscriber.  The free trial subscription does not support enough cores to run this tutorial.
+3. Install the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest).
+4. Clone and set up the [Flux manifest repository](#cloning-and-setting-up-a-flux-manifest-repository).
+5. Create an [Azure Service Principal](https://github.com/microsoft/bedrock/tree/master/cluster/azure/service-principal).
+6. Create an [RSA key for logging into AKS nodes](creating-an-rsa-key-for-logging-into-aks-nodes). 
 
 The following procedures complete the prerequisites then walk through the process of configuring Terraform and Bedrock scripts, deploying the cluster, and checking the deployed cluster's health.
 
