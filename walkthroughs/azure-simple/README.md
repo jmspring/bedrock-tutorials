@@ -1,25 +1,25 @@
 # A Walkthrough of Deploying Azure Simple Bedrock Environment
 
-This document walks through the necessary steps to deploy a Bedrock deployment using the 
-[Azure Simple](https://github.com/microsoft/bedrock/cluster/environments/azure-simple) environment.  It does not include the whole [gitops](https://github.com/microsoft/bedrock/gitops) workflow.  Instead, we assume a pre-existing [Flux Manifest repository](https://github.com/microsoft/bedrock/tree/master/cluster/common/flux) which will be cloned and set up for the needs of this walkthrough.
+This document walks throuh a Bedrock deployment using the Bedrock environment.  It does not include everything available using the [gitops](https://github.com/microsoft/bedrock/gitops) workflow. We create an empty repo through which we deploy an update that demonstrates the Flux automation.
 
 This walkthrough consists of the following:
 
 - [Setting up Prerequisites](#prerequisites)
 - [Configure Terraform For Azure Access](#configure-terraform-for-azure-access)
-- [Clone The Bedrock Repository](#clone-the-bedrock-repository)
+- [Create an empty git repo for Kubernetes resource manifests](#create-an-empty-git-repo-for-new-kubernetes-resource-manifests)
 - [Setup Terraform Deployment Variables for Azure Simple](#setup-terraform-deployment-variables-for-azure-simple)
 - [Deploy the Azure Simple Template](#deploy-the-azure-simple-template)
 - [Interact with the Deployed Cluster](#interact-with-the-deployed-cluster)
+- [Deploy a update using Kubernetes manifest]()
 
 ## Prerequisites
 
-Prior to starting the deployment, there are several required steps:
+Before starting the deployment, there are several required steps:
 
 1. Install the required common tools (kubectl, helm, and terraform).  See also [Required Tools](https://github.com/microsoft/bedrock/tree/master/cluster). Note: this tutorial currently uses [Terraform 0.11.13](https://releases.hashicorp.com/terraform/0.11.13/).
-2. Enroll as an Azure subscriber.  The free trial subscription does not support enough cores to run this tutorial.
+2. Enroll as an Azure subscriber.  The free trial subscription may not support enough cores to run this tutorial.
 3. Install the [Azure CLI](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest).
-4. Clone and set up the [Flux manifest repository](#cloning-and-setting-up-a-flux-manifest-repository).
+4. Set up and clone the [Flux manifest repository](#set-up-and-clone-flux-manifest-repository).
 5. Create an [Azure Service Principal](https://github.com/microsoft/bedrock/tree/master/cluster/azure/service-principal).
 6. Create an [RSA key for logging into AKS nodes](creating-an-rsa-key-for-logging-into-aks-nodes). 
 
@@ -41,9 +41,11 @@ There is also a set of [scripts](https://github.com/jmspring/bedrock-dev-env/tre
 
 For information specific to your operating system, see the [Azure CLI install guide](https://docs.microsoft.com/en-us/cli/azure/install-azure-cli?view=azure-cli-latest).  You can also use [this script](https://github.com/jmspring/bedrock-dev-env/blob/master/scripts/setup_azure_cli.sh) if running on a Unix based machine.
 
-### Cloning and Setting Up a Flux Manifest Repository
+### Set Up and Clone Flux Manifest Repository
 
-As mentioned, this document will leverage a pre-existing Flux manifest repository.  However, there is still a bit of work to do.  To use the [Flux repository](https://github.com/andrebriggs/sample_app_manifests/tree/master/prod), we must:
+Create an empty git repository.  We will deploy the Bedrock environment using the empty repo and then add a Kubernetes manifest that defines a simple Web application.  The change to the repo will automatically update the deployment.
+
+To use your Flux repository you must:
 
 1. Create an RSA keypair for the Flux repository
 2. Fork the repository
@@ -79,11 +81,11 @@ The key's randomart image is:
 kudzu:azure-simple jmspring$ 
 ```
 
-This will create public and private keys for the Flux repository. We will assign the public key under the following heading: [Adding the Repository Key](#adding-the-repository-key).  The private key is stored on the machine originating the deployment.
+This will create public and private keys for the Flux repository. We will assign the public key under the following heading: [Adding the Repository Key](#add-the-repository-key).  The private key is stored on the machine originating the deployment.
 
-#### Forking the Repository
+#### Fork the Repository
 
-To fork the repository, use the [sample manifests](https://github.com/andrebriggs/sample_app_manifests/tree/master/prod) as shown following:
+Fork the empty repository as shown in the following steps:
 
 ![initial repository](https://raw.githubusercontent.com/jmspring/bedrock-tutorials/master/walkthroughs/azure-simple/images/initial_repository.png)
 
@@ -91,7 +93,7 @@ Click "Fork" and you should see something resembling:
 
 ![forked repository](https://raw.githubusercontent.com/jmspring/bedrock-tutorials/master/walkthroughs/azure-simple/images/forked_repository.png)
 
-#### Adding Repository Key
+#### Add Repository Key
 
 The public key of the [RSA key pair](#create-an-rsa-key-pair-for-a-deploy-key-for-the-flux-repository) previously created needs to be added as a deploy key.  
 
@@ -203,37 +205,9 @@ ARM_SUBSCRIPTION_ID=7060bca0-1234-5-b54c-ab145dfaccef
 ARM_TENANT_ID=72f984ed-86f1-41af-91ab-87acd01ed3ac
 ARM_CLIENT_SECRET=35591cab-13c9-4b42-8a83-59c8867bbdc2
 ARM_CLIENT_ID=7b6ab9ae-dead-abcd-8b52-0a8ecb5beef7
-```
+``` 
 
-### Clone The Bedrock Repository
-
-Use the [Bedrock repository](https://github.com/microsoft/bedrock).  Clone it with the `git` command: `git clone https://github.com/microsoft/bedrock.git`
-
-```bash
-kudzu:azure-simple jmspring$ git clone https://github.com/microsoft/bedrock.git
-Cloning into 'bedrock'...
-remote: Enumerating objects: 37, done.
-remote: Counting objects: 100% (37/37), done.
-remote: Compressing objects: 100% (32/32), done.
-remote: Total 2154 (delta 11), reused 11 (delta 5), pack-reused 2117
-Receiving objects: 100% (2154/2154), 29.33 MiB | 6.15 MiB/s, done.
-Resolving deltas: 100% (1022/1022), done.
-```
-
-To verify, navigate to the `bedrock/cluster/environments` directory and do an `ls` command:
-
-```bash
-kudzu:environments jmspring$ ls -l
-total 0
-drwxr-xr-x   8 jmspring  staff  256 Jun 12 09:11 azure-common-infra
-drwxr-xr-x  15 jmspring  staff  480 Jun 12 09:11 azure-multiple-clusters
-drwxr-xr-x   6 jmspring  staff  192 Jun 12 09:11 azure-simple
-drwxr-xr-x   7 jmspring  staff  224 Jun 12 09:11 azure-single-keyvault
-drwxr-xr-x   7 jmspring  staff  224 Jun 12 09:11 azure-velero-restore
-drwxr-xr-x   3 jmspring  staff   96 Jun 12 09:11 minikube
-```
-
-Each of the directories represent a common pattern supported within Bedrock.  You can read more about them on the [Bedrock github repo](https://github.com/microsoft/bedrock/tree/master/cluster/azure).  
+### Create an empty git repo for new Kubernetes resource manifests
 
 ### Setup Terraform Deployment Variables for Azure Simple
 
@@ -276,7 +250,7 @@ vnet_name = "<vnet name>"
 
 From previous procedures, we have values for `service_principal_id`, `service_principal_secret`, `ssh_public_key`, `gitops_ssh_key`.  For purposes of this walkthrough the defaults for `agent_vm_count=3` and `resource_group_location=westus2` are usable. 
 
-To get the gitopp_ssh_url, go back to the sample repository that was cloned in [Forking the Repository](#forking-the-repository).  Click **Clone or download**, and select **Use SSH**.
+To get the gitopp_ssh_url, go back to the sample repository that was cloned in [Fork the Repository](#fork-the-repository).  Click **Clone or download**, and select **Use SSH**.
 
 ![use ssh](./images/use-ssh.png)
 
@@ -287,7 +261,7 @@ Define the remainding fields:
 - `dns_prefix`: `testazuresimple`
 - `vnet_name`: `testazuresimplevnet`
 
-For this tutorial, given the GitHub user `jmspring`, the `gitops_ssh_url` value is `git@github.com:jmspring/sample_app_manifests.git` previously [cloned](#forking-the-repository) and obtained as shown above.  
+For this tutorial, given the GitHub user `jmspring`, the `gitops_ssh_url` value is `git@github.com:jmspring/sample_app_manifests.git` previously [cloned](#fork-the-repository) and obtained as shown above.  
 
 Note that the, `gitops_ssh_key` is a *path* to the RSA private key we created under the heading[Create an RSA Key Pair for a Deploy Key for the Flux Repository](#create-an-rsa-key-pair-for-a-deploy-key-for-the-flux-repository)
 
@@ -316,11 +290,9 @@ vnet_name = "testazuresimplevnet"
 #--------------------------------------------------------------
 # gitops_url_branch = "release-123"
 # gitops_poll_interval = "30s"
-gitops_path = "prod"
+# gitops_path = "prod"
 # network_policy = "calico"
 ```
-
-Note that our Flux deployment manifests are actually in a sub-directory within our [Flux Manifest Repository](#forking-the-repository), therefore `gitops_path` has been uncommented.
 
 ### Deploy the Azure Simple Template
 
