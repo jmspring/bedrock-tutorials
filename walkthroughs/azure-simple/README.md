@@ -31,7 +31,7 @@ This document assumes one is running a current version of Ubuntu.  Windows users
 
 You can also turn on Windows Subsystem for Linux in settings:
 
-![Windows Subsystem for Linux](./images/WinSubsysLinux.png)
+
 
 Per Step 1. in [Prerequisites](#prerequisites) and [the Bedrock documentation](https://github.com/microsoft/bedrock/tree/master/cluster#required-tools), one must install `helm`, `terraform` and `kubectl`.  There are links for each in the documentation.
 
@@ -104,7 +104,7 @@ ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDTNdGpnmztWRa8RofHl8dIGyNkEayNR6d7p2JtJ7+z
 
 Next, on the newly forked repository, select `Settings` -> `Deploy Keys` -> `Add deploy key`.  Give your key a title and paste in the contents of your public key.  Important: allow the key to have `Write Access`.  When complete, the screen should resemble:
 
-![enter key](./images/enter_key.png)
+
 
 Click "Approve" and one should see:
 
