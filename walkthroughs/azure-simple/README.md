@@ -1,7 +1,7 @@
 # A Walkthrough of Deploying Azure Simple Bedrock Environment
 
 This document walks through the necessary steps to deploy a Bedrock deployment using the 
-[Azure Simple](https://github.com/microsoft/bedrock/cluster/environments/azure-simple) environment.  It does not include the whole [gitops](https://github.com/microsoft/bedrock/gitops) workflow.  Instead, we assume a pre-existing [Flux Manifest repository](https://github.com/microsoft/bedrock/tree/master/cluster/common/flux) which will be cloned and set up for the needs of this walkthrough.
+[Azure Simple](https://github.com/microsoft/bedrock/cluster/environments/azure-simple) environment.  It does not include the whole [gitops](https://github.com/microsoft/bedrock/gitops) workflow.  Instead, we assume a pre-existing [Flux Manifest repository](https://github.com/andrebriggs/sample_app_manifests/tree/master/prod) which will be cloned and set up for the needs of this walkthrough.
 
 This walkthrough consists of the following:
 
